@@ -6,15 +6,44 @@ import time
 from sklearn.metrics import pairwise
 from PIL import ImageGrab
 
+height , width , channels=0,0,0
+
 def draw_lines(img, lines,store):
 	try:
 		for line in lines:
 			coords = line[0]
-			cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 5)
+			flag = 0 
+			if coords[2]==coords[0]:
+				slope=99
+			else:
+				slope=(coords[1]-coords[3])/(coords[2]-coords[0])
+				if -0.3 < slope < 0.3:
+					cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [255,0,0], 3)           # blue color horizontal
+				else:
+					# if         width//2 abs(coords[0] - coords[2])
+					if slope < 0:
+						if  (coords[0] + coords[2])/2 < width//2 < max([coords[0],coords[2]]):
+							flag=1
+					else:
+						if (coords[0] + coords[2])/2 < width//2 < min([coords[0],coords[2]]):
+							flag=1
+
+					slope=str(slope)[:5]
+					cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+					cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)         # yellow color vertical
+
+					if flag == 1:
+						cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+
+
+			# cv2.line(img, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 5)
+			# cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)
+
 
 	except:
 	    pass
 	cv2.imshow("store",store)
+	# cv2.imshow("later",img)
 
 
 
@@ -32,7 +61,7 @@ def process_img(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # edge detection
     image =  cv2.Canny(image, threshold1 = 200, threshold2=300)
-    # image = cv2.GaussianBlur(image,(2,2),0)
+    image = cv2.GaussianBlur(image,(3,3),0)
 
     # vertices = np.array([[50,500],[50,300], [450,200], [800,200], [1230,300], [1230,500]], np.int32)
     # vertices = np.array([[50,500],[50,350], [450,250], [800,250], [1230,350], [1230,500]], np.int32)
@@ -43,7 +72,7 @@ def process_img(image):
 
     image = roi(image, [vertices])
 
-    lines = cv2.HoughLinesP(image, 1, np.pi/180, 180,  minLineLength = 10, maxLineGap = 15)
+    lines = cv2.HoughLinesP(image, 1, np.pi/180, 180, np.array([]), minLineLength = 5, maxLineGap = 35)
     draw_lines(image,lines,store)
 
     return image
@@ -53,26 +82,29 @@ def process_img(image):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../../videos/e.mp4')
-cap.set(1,200)
+cap=cv2.VideoCapture('../../videos/c.mp4')
+cap.set(1,1700)
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
 
 
 
 def screen_record(): 
-    last_time = time.time()
-    while(True):
-        _ , screen =  cap.read()
-        cv2.imshow('original', screen )
+	last_time = time.time()
+	while(True):
+		_ , screen =  cap.read()
+		global height , width , channels
+		height, width, channels = screen.shape
+		cv2.imshow('original', screen )
 
-        new_screen = process_img(screen)
-        print('loop took {} seconds'.format(time.time()-last_time))
-        last_time = time.time()
-        cv2.imshow('later', new_screen )
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            cv2.destroyAllWindows()
-            cap.release()
-            break
+		new_screen = process_img(screen)
+		# print('loop took {} seconds'.format(time.time()-last_time))
+		# last_time = time.time()
+		cv2.imshow('later', new_screen )
+		if cv2.waitKey(25) & 0xFF == ord('q'):
+		    cv2.destroyAllWindows()
+		    cap.release()
+		    break
+
 
 screen_record()
