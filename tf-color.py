@@ -6,6 +6,7 @@ import cv2
 import imutils
 import time
 from sklearn.metrics import pairwise
+from imutils.video import FPS
 
 
 size=64
@@ -32,9 +33,10 @@ cap=cv2.VideoCapture('../videos/f.mp4')
 cap.set(1,1100)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
+fps = FPS().start()
 
 
-time.sleep(2.0)
+# time.sleep(2.0)
 
 ct=0
 while True:
@@ -86,10 +88,14 @@ while True:
 
 
 
+    fps.update()
 
     cv2.imshow("Frame", frame)
     if cv2.waitKey(100) & 0xFF == ord("q"):
         break
-
+# stop the timer and display FPS information
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
 cv2.destroyAllWindows()

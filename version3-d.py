@@ -4,6 +4,7 @@
 import cv2
 import numpy as np
 import copy
+from imutils.video import FPS
 
 net = cv2.dnn.readNet("../yolov3.weights", "../yolov3.cfg")
 classes = []
@@ -37,6 +38,7 @@ def iou(boxA, boxB):
 cap=cv2.VideoCapture('../videos/i.mp4')
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+fps = FPS().start()
 
 prev_frame=[]
 number=0
@@ -204,8 +206,13 @@ while True:
     cv2.imshow("version", img)
     out1.write(img)
     key=cv2.waitKey(100)
+    fps.update()
     if key & 0xFF == ord("q"):
         break
+# stop the timer and display FPS information
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
 out1.release()
 cv2.destroyAllWindows()
