@@ -42,7 +42,7 @@ category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABE
 # In[35]:
 
 
-model_name = 'checkpoints_ssdlite_mobilenet_edgetpu_coco_quant'
+model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
 model_dir =  "../bigdata/models/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
@@ -140,11 +140,11 @@ from imutils.video import FPS
 
 cap=cv2.VideoCapture('../videos/a.mp4')
 cap.set(1,1100)
+time.sleep(2.0)
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
 
-# time.sleep(2.0)
 fps = FPS().start()
 
 ctt = 0
@@ -161,7 +161,7 @@ while True:
 
 
     cv2.imshow("version", frame)
-    out1.write(frame)
+    # out1.write(frame)
     fps.update()
 
     key=cv2.waitKey(100)
@@ -173,7 +173,7 @@ fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
-out1.release()
+# out1.release()
 cv2.destroyAllWindows() 
 
 
