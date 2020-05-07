@@ -2,16 +2,11 @@ import numpy as np
 import os
 import six.moves.urllib as urllib
 import sys
-import tarfile
 import tensorflow as tf
-import zipfile
 import pathlib
 from collections import defaultdict
-from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
-from IPython.display import display
-
 
 # sys.path.append('../../research')
 
@@ -22,24 +17,12 @@ from utils import visualization_utils as vis_util
 
 
 
-
-# patch tf1 into `utils.ops`
 utils_ops.tf = tf.compat.v1
-
-# Patch the location of gfile
 tf.gfile = tf.io.gfile
-
-
-
-
-
-
 PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
-
-# In[35]:
 
 
 model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
@@ -47,53 +30,73 @@ model_dir =  "../bigdata/models/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
 
-# http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz
 
 
-
-
-
+# print(category_index)
 print(detection_model.inputs)
 print(detection_model.output_dtypes)
 print(detection_model.output_shapes)
 
+def trafficlight(output_dict):
+  for ind,scr in enumerate(output_dict['detection_classes']):
+    if scr==8:
+      output_dict['detection_scores'][ind] = 0.51
+    # print(scr)
+  return output_dict
 
 
 def run_inference_for_single_image(model, image):
   image = np.asarray(image)
-  # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
   input_tensor = tf.convert_to_tensor(image)
-  # The model expects a batch of images, so add an axis with `tf.newaxis`.
   input_tensor = input_tensor[tf.newaxis,...]
 
-  # Run inference
-  output_dict = model(input_tensor)
 
-  # All outputs are batches tensors.
-  # Convert to numpy arrays, and take index [0] to remove the batch dimension.
-  # We're only interested in the first num_detections.
+
+  # output_dict is a dict  with keys detection_classes , num_detections , detection_boxes(4 coordinates of each box) , detection_scores for 100 boxes
+  output_dict = model(input_tensor)
+  # print(1,output_dict)
+
+
+
+
+  # num_detections gives number of objects in current frame
   num_detections = int(output_dict.pop('num_detections'))
+  # print(2,num_detections)
+
+
+
+  # output_dict is a dict  with keys detection_classes , detection_boxes(4 coordinates of each box) , detection_scores for num_detections boxes
   output_dict = {key:value[0, :num_detections].numpy() 
                  for key,value in output_dict.items()}
+
+
+  # adding num_detections that was earlier popped out
   output_dict['num_detections'] = num_detections
 
-  # detection_classes should be ints.
+
+  # converting all values in detection_classes as ints.
   output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
-   
+  print(5,output_dict)
+
+
+  output_dict = trafficlight(output_dict)
+  print(6,output_dict)
+
+
   # Handle models with masks:
   if 'detection_masks' in output_dict:
     # Reframe the the bbox mask to the image size.
     detection_masks_reframed = utils_ops.reframe_box_masks_to_image_masks(
               output_dict['detection_masks'], output_dict['detection_boxes'],
-               image.shape[0], image.shape[1])      
+               image.shape[0], image.shape[1])   
     detection_masks_reframed = tf.cast(detection_masks_reframed > 0.5,
                                        tf.uint8)
     output_dict['detection_masks_reframed'] = detection_masks_reframed.numpy()
-    
+    print(5,detection_masks_reframed) 
   return output_dict
 
 
-# In[40]:
+
 
 
 def show_inference(model, image_path):
@@ -116,7 +119,6 @@ def show_inference(model, image_path):
       use_normalized_coordinates=True,
       line_thickness=8)
 
-  # display(Image.fromarray(image_np))
   return image_np
 
 
@@ -137,10 +139,10 @@ from sklearn.metrics import pairwise
 from imutils.video import FPS
 
 # cap=cv2.VideoCapture(0)
-
 cap=cv2.VideoCapture('../videos/a.mp4')
-cap.set(1,1100)
 time.sleep(2.0)
+
+cap.set(1,190*25)
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
@@ -157,6 +159,8 @@ while True:
     # print('frame_resize',frame.shape)
     print(ctt)
     ctt = ctt + 1
+    if ctt==334:
+      break
     frame=show_inference(detection_model, frame)
 
 
