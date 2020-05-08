@@ -16,7 +16,8 @@ colors = np.random.uniform(0, 255, size=(len(classes), 3))
 # img = cv2.resize(img, (320,320))
 # img = cv2.resize(img, (609,609))
 
-cap=cv2.VideoCapture('../../videos/highway.mp4')
+cap=cv2.VideoCapture('../../videos/a.mp4')
+cap.set(1,190*25)
 prop=cv2.CAP_PROP_FRAME_COUNT
 total = int(cap.get(prop))
 print(total)

@@ -14,24 +14,18 @@ layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
+
 def iou(boxA, boxB):
-    # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
     yB = min(boxA[3], boxB[3])
-    # compute the area of intersection rectangle
     interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
-    # compute the area of both the prediction and ground-truth
-    # rectangles
+
     boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
     boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
-    # compute the intersection over union by taking the intersection
-    # area and dividing it by the sum of prediction + ground-truth
-    # areas - the interesection area
-    # print(interArea, float(boxAArea + boxBArea - interArea))
+
     iou = interArea / float(boxAArea + boxBArea - interArea)
-    # return the intersection over union value
     return iou
 
 # cap=cv2.VideoCapture(0)
@@ -66,7 +60,6 @@ while True:
         for detection in out:
             scores = detection[5:]
             class_id = np.argmax(scores)
-            # print(classes[class_id])
             if (classes[class_id]=='person' or classes[class_id]=='bicycle' or classes[class_id]=='car' or classes[class_id]=='motorbike'  or classes[class_id]=='bus'  or classes[class_id] =='truck' or classes[class_id]=='traffic light'):
 
 	            confidence = scores[class_id]
