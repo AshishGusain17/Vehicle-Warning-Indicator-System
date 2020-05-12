@@ -1,105 +1,111 @@
 # adding and removal of cars after tracking (using iou)
 # detect only vehicles
+# detection using tf
 
-import cv2
 import numpy as np
-import copy
+import os
+import six.moves.urllib as urllib
+import sys
+import tensorflow as tf
+import pathlib
+from collections import defaultdict
+from matplotlib import pyplot as plt
+import cv2
+import imutils
+import time
+from sklearn.metrics import pairwise
 from imutils.video import FPS
+import copy
+from PIL import Image
 
-net = cv2.dnn.readNet("../yolov3.weights", "../yolov3.cfg")
-classes = []
-with open("../coco.names", "r") as f:
-    classes = [line.strip() for line in f.readlines()]
-layer_names = net.getLayerNames()
-output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-colors = np.random.uniform(0, 255, size=(len(classes), 3))
+
+
+from utils import ops as utils_ops
+from utils import label_map_util
+
+
+
+utils_ops.tf = tf.compat.v1
+tf.gfile = tf.io.gfile
+PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
+category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+
+
+
+
+model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
+model_dir =  "../bigdata/models/" + model_name + "/saved_model"
+detection_model = tf.saved_model.load(str(model_dir))
+detection_model = detection_model.signatures['serving_default']
+
+
+
+# print(category_index)
+colors = np.random.uniform(0, 255, size=(len(category_index), 3))
+font = cv2.FONT_HERSHEY_PLAIN
+
+print(detection_model.inputs)
+print(detection_model.output_dtypes)
+print(detection_model.output_shapes)
+
+  
+
 
 def iou(boxA, boxB):
-    # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
     yB = min(boxA[3], boxB[3])
     # compute the area of intersection rectangle
     interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
-    # compute the area of both the prediction and ground-truth
-    # rectangles
+    # compute the area of both the prediction and ground-truth rectangles
     boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
     boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
-    # compute the intersection over union by taking the intersection
-    # area and dividing it by the sum of prediction + ground-truth
-    # areas - the interesection area
     # print(interArea, float(boxAArea + boxBArea - interArea))
     iou = interArea / float(boxAArea + boxBArea - interArea)
-    # return the intersection over union value
     return iou
 
-# cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/i.mp4')
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
-fps = FPS().start()
-
-prev_frame=[]
-number=0
-cot=0
-while True:
-    _,img=cap.read()
-    # if cot<120:
-    # 	cot=cot+1
-    # 	print(cot)
-    # 	continue
-    height, width, channels = img.shape
-
-    # Detecting objects
-    blob = cv2.dnn.blobFromImage(img, 0.00392, (416,416), (0, 0, 0), True, crop=False)
-
-    net.setInput(blob)
-    outs = net.forward(output_layers)
-
-    # Showing informations on the screen
-    class_ids = []
-    confidences = []
-    boxes = []
-    for out in outs:
-        for detection in out:
-            scores = detection[5:]
-            class_id = np.argmax(scores)
-            # print(classes[class_id])
-            if (classes[class_id]=='person' or classes[class_id]=='bicycle' or classes[class_id]=='car' or classes[class_id]=='motorbike'  or classes[class_id]=='bus'  or classes[class_id] =='truck'):
-
-	            confidence = scores[class_id]
-	            if confidence > 0.5:
-	                # Object detected
-	                center_x = int(detection[0] * width)
-	                center_y = int(detection[1] * height)
-
-	                w = int(detection[2] * width)
-	                h = int(detection[3] * height)
-
-	                # Rectangle coordinates
-	                x = int(center_x - w / 2)
-	                y = int(center_y - h / 2)
-	                if (w*h >=800):
-		                boxes.append([x, y, w, h])
-		                confidences.append(float(confidence))
-		                class_ids.append(class_id)
-
-    indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
-    # print(indexes)
-    font = cv2.FONT_HERSHEY_PLAIN
 
 
+
+def visualize(output_dict,image_np,height,width):
+  class_ids = []
+  confidences = []
+  boxes = []
+  num = output_dict['num_detections']
+  for ind in range(num):
+    scr = output_dict['detection_scores'][ind]
+    classId = output_dict['detection_classes'][ind] 
+    box = output_dict['detection_boxes'][ind]
+
+    ymin, xmin, ymax, xmax = box
+    confidences.append(float(scr))
+    class_ids.append(classId)
+    boxes.append([int(xmin*width) , int(ymin*height) , int((xmax-xmin)*width) , int((ymax-ymin)*height)])
+
+  indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+  # if len(boxes) != len(indexes):
+  #   print(indexes,boxes , confidences,class_ids)
+  for j in indexes:
+    i = j[0]
+    x, y, w, h = boxes[i]
+    label = category_index[class_ids[i]]['name']
+    color = colors[i]
+    cv2.rectangle(image_np, (x, y), (x + w, y + h), color, 3)
+    cv2.putText(image_np, label, (x, y - 5), font, 3, color, 3)
+  # return image_np
+
+
+
+def tracking(indexesCars , boxesCars , image_np):
+    global prev_frame , number
     change=[]
     curr_frame=[]
-
-    for i in range(len(boxes)):
-        if i in indexes:
-            x, y, w, h = boxes[i]
-            label = str(classes[class_ids[i]])
-            # color = colors[i]
-            # cx,cy = (2*x + w)/2  ,  (2*y + h)/2
-            curr_frame.append([x,y,x+w,y+h,label])
+    for j in indexesCars:
+        i = j[0]
+        x, y, w, h = boxesCars[i]
+        label = "vehicle"
+        curr_frame.append([x,y,x+w,y+h,label])
 
     # object tracking 
     curr , prev=copy.deepcopy(curr_frame) , copy.deepcopy(prev_frame)
@@ -115,20 +121,18 @@ while True:
                 # x1 , y1 = prev_obj[0] , prev_obj[1]
                 l2 = [ prev_obj[0], prev_obj[1], prev_obj[2], prev_obj[3] ]
                 ans = iou( l1 , l2 )
-                # ans=((x2-x1)**2+(y2-y1)**2)**(1/2)
                 if ans > small:
                     small = ans
                     ll1,ll2=l1,l2
                     ind = prev_obj[4]
                     chct = prev_obj[5]
-                    # aa,bb,cc,dd=x1,y1,x2,y2
                     pop1 , pop2 = curr_ind , prev_ind
                     new_list = [ curr_obj[0], curr_obj[1], curr_obj[2], curr_obj[3] , ind ]
                     disp=curr_obj
         # print(small,aa,bb,cc,dd)
-        print(curr,prev)
-        print(small,ll1,ll2)
-        print(len(curr_frame) , len(prev_frame) , len(curr) , len(prev))
+        # print(curr,prev)
+        # print(small,ll1,ll2)
+        # print(len(curr_frame) , len(prev_frame) , len(curr) , len(prev))
         # print(min([len(prev_frame),len(curr_frame)]))
         if small > 0.45:                   # decrease this if objects are small and their iou can change to a greater extent
             display.append([disp,ind,chct])
@@ -137,15 +141,15 @@ while True:
             change.append(new_list)
         else:
             break
-        print(len(change),len(display))
+        # print(len(change),len(display))
 
-    print('display curr',display,curr)       
+    # print('display curr',display,curr)       
     for i in display:
         color=colors[i[1]%75]
         x1,y1,x2,y2,label = i[0][0] , i[0][1] , i[0][2] , i[0][3] , i[0][4] 
-        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+        cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(i[1]) 
-        cv2.putText(img, text, (x1, y1 + 30), font, 3, color, 2)
+        cv2.putText(image_np, text, (x1, y1 + 30), font, 3, color, 2)
 
     for i in curr:
         number=number+1
@@ -153,11 +157,9 @@ while True:
         prev_frame.append([i[0], i[1], i[2], i[3], number,0])
         x1, y1, x2, y2, label = i[0] , i[1] , i[2] , i[3] , i[4] 
 
-        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+        cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(number)
-        cv2.putText(img, text, (x1, y1 + 30), font, 3, color, 2)
-
-
+        cv2.putText(image_np, text, (x1, y1 + 30), font, 3, color, 2)
 
 
     if number==0:
@@ -172,10 +174,7 @@ while True:
             cv2.putText(img, text, (xx1, yy1 + 30), font, 3, color, 2)
 
 
-
-
     # print(number , len(prev_frame),len(curr_frame))
-    print()
     for ch in change:
         find=ch[4]
         for rr,ob in enumerate(prev_frame):
@@ -189,30 +188,111 @@ while True:
         prev_frame[rr][5]+=1
         if prev_frame[rr][5]>=6:
             index_note.append(rr)
-    print("prev_frame",prev_frame)
-    print(index_note)
+    # print("prev_frame",prev_frame)
+    # print(index_note)
     lll=[]
     for rr,ob in enumerate(prev_frame):
-    	flag=0
-    	for j in index_note:
-    		if j==rr:
-    			flag=1
-    			break
-    	if flag==0:
-    		lll.append(ob)
+        flag=0
+        for j in index_note:
+            if j==rr:
+                flag=1
+                break
+        if flag==0:
+            lll.append(ob)
     prev_frame=lll
-    print('after pop',prev_frame)
+    # print('after pop',prev_frame)
+    return image_np
 
-    cv2.imshow("version", img)
-    out1.write(img)
-    key=cv2.waitKey(100)
+
+
+def show_inference(model, image_path):
+    image_np = np.array(image_path)
+    height,width,channel = image_np.shape
+
+    image = np.asarray(image_np)
+    input_tensor = tf.convert_to_tensor(image)
+    input_tensor = input_tensor[tf.newaxis,...]
+
+    # output_dict is a dict  with keys detection_classes , num_detections , detection_boxes(4 coordinates of each box) , detection_scores for 100 boxes
+    output_dict = model(input_tensor)
+
+
+    # num_detections gives number of objects in current frame
+    num_detections = int(output_dict.pop('num_detections'))
+    # output_dict is a dict  with keys detection_classes , detection_boxes(4 coordinates of each box) , detection_scores for num_detections boxes
+    output_dict = {key:value[0, :num_detections].numpy() 
+                  for key,value in output_dict.items()}
+    # adding num_detections that was earlier popped out
+    output_dict['num_detections'] = num_detections
+    # converting all values in detection_classes as ints.
+    output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
+    # print(5,output_dict)
+
+    confidencesCars = []
+    boxesCars = []
+
+    num = output_dict['num_detections']
+    for ind in range(num):
+        classId = output_dict['detection_classes'][ind] 
+        if classId==2 or classId==3 or classId==4 or classId==6 or classId==8:
+            scr = output_dict['detection_scores'][ind]
+            box = output_dict['detection_boxes'][ind]
+            ymin, xmin, ymax, xmax = box
+            w = (xmax - xmin) * width
+            h = (ymax - ymin) * height
+            if (w*h >=800):
+                boxesCars.append([int(xmin*width) , int(ymin*height) , int(w) , int(h)])
+                confidencesCars.append(float(scr))
+
+    indexesCars = cv2.dnn.NMSBoxes(boxesCars, confidencesCars, 0.5, 0.4)
+
+    image_np = tracking(indexesCars , boxesCars , image_np)
+
+
+    # visualize(output_dict,image_np,height,width)
+    cv2.imshow("version", image_np)
+
+
+
+
+
+
+
+
+
+# cap=cv2.VideoCapture(0)
+cap=cv2.VideoCapture('../videos/a.mp4')
+time.sleep(2.0)
+
+cap.set(1,100)
+
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+
+fps = FPS().start()
+ctt = 0
+number=0
+prev_frame = []
+while True:
+    _,frame=cap.read()
+    height, width, channels = frame.shape
+
+    show_inference(detection_model, frame)
+
+    cv2.imshow("original", frame)
+    # out1.write(frame)
     fps.update()
+
+    key=cv2.waitKey(100)
     if key & 0xFF == ord("q"):
         break
-# stop the timer and display FPS information
+        
 fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
-out1.release()
-cv2.destroyAllWindows()
+# out1.release()
+cv2.destroyAllWindows() 
+
+
+

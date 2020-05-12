@@ -9,9 +9,9 @@ from sklearn.metrics import pairwise
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-startRedLower = (0 , 200 , 80)
-startRedUpper = (7 , 255, 255)
-endRedLower = (173 , 200 , 80)
+startRedLower = (0 , 180 , 90)
+startRedUpper = (10 , 255, 255)
+endRedLower = (170 , 180 , 90)
 endRedUpper = (180 , 255 , 255)
 
 blackLower = (0 , 0 , 0)
@@ -30,6 +30,7 @@ def confirm_day_or_night(frame , flag_night_counter):
       pixel_ct = pixel_ct + np.sum(i==0)
       pixel_len = pixel_len + len(i)
     ratio = pixel_ct / pixel_len
+    print("ratio = ",ratio)
     if ratio < 0.55:
         flag_night_counter = flag_night_counter + 1
         return flag_night_counter
@@ -39,8 +40,8 @@ def confirm_day_or_night(frame , flag_night_counter):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/f.mp4')
-set_pos=72*25
+cap=cv2.VideoCapture('../videos/a.mp4')
+set_pos=292*25
 cap.set(1,set_pos)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
@@ -61,6 +62,7 @@ while True:
             print("flag_night_counter = ",flag_night_counter)
             cap.set(1 , set_pos)
             initial_flag = 1
+
     else:
         if flag_night_counter > 4:
             cv2.putText(frame,"NIGHT",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
@@ -69,7 +71,7 @@ while True:
             maskRed = mask1 + mask2
             maskRed = cv2.erode(maskRed, None, iterations=2)
             maskRed = cv2.dilate(maskRed, None, iterations=2)
-            cv2.imshow('Red',imutils.resize(maskRed,width=250))
+            # cv2.imshow('Red',imutils.resize(maskRed,width=250))
 
             (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
             hull = []
@@ -83,22 +85,24 @@ while True:
                 cY = int((extreme_top[1] + extreme_bottom[1]) / 2)
                 distance = pairwise.euclidean_distances([(cX, cY)], Y=[extreme_left, extreme_right, extreme_top, extreme_bottom])[0]
                 radius = int(distance[distance.argmax()])
-                center=(cX,cY)
 
-                if radius > 10:
-                    cv2.circle(frame, (int(cX), int(cY)), int(radius),(0, 255, 255), 2)
+                if radius >15:
+                    cv2.circle(frame, (int(cX), int(cY)), int(radius),(167,133,0), 2)
                     hull.append(chull)
+                    cv2.putText(frame,"Let me show you brake-lights radiations patches.",(170 ,80), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
+                    cv2.putText(frame,"Apply brakes accordingly.",(330 ,120), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
+
 
             print("length = ",len(hull))
 
             # draw contours and hull points
             for i in range(len(hull)):
                 color_contours = (0, 255, 0) # green - color for contours
-                color = (255, 0, 0) # blue - color for convex hull
+                color = (0, 255, 255) # blue - color for convex hull
                 # draw ith contour
                 cv2.drawContours(frame, contours, i, color_contours, 1, 8, hierarchy)
                 # draw ith convex hull object
-                cv2.drawContours(frame, hull, i, color, 1, 8)    
+                cv2.drawContours(frame, hull, i, color, 2, 8)    
         else:                                                                                                   # DAY TIME
             cv2.putText(frame,"DAY",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)
 
@@ -120,7 +124,11 @@ cv2.destroyAllWindows()
 
 
 
-# a.mp4   60*25
+# a.mp4(25fps)   25*25    292*25    
+# c.mp4(24fps) 133*24 + 6
+# d.mp4(24fps) 195*24   419*24
+# e.mp4(24fps) 47  283    338
+# f.mp4(24fps) 36  223
 
 # startRedLower = (0 , 150 , 50)
 # startRedUpper = (15 , 255, 255)

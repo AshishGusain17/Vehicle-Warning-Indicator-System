@@ -37,12 +37,7 @@ print(detection_model.inputs)
 print(detection_model.output_dtypes)
 print(detection_model.output_shapes)
 
-def trafficlight(output_dict):
-  for ind,scr in enumerate(output_dict['detection_classes']):
-    if scr==8:
-      output_dict['detection_scores'][ind] = 0.51
-    # print(scr)
-  return output_dict
+
 
 
 def run_inference_for_single_image(model, image):
@@ -78,9 +73,6 @@ def run_inference_for_single_image(model, image):
   output_dict['detection_classes'] = output_dict['detection_classes'].astype(np.int64)
   print(5,output_dict)
 
-
-  output_dict = trafficlight(output_dict)
-  print(6,output_dict)
 
 
   # Handle models with masks:
