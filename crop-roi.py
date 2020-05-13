@@ -29,7 +29,10 @@ while True:
   key = cv2.waitKey(1) & 0xFF
   if cropped == 0:
     # display the image and wait for a keypress
-    cv2.putText(image, "Click 4 points to select dash area",  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+    cv2.putText(image, "Click points to select region of interest.",  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+    cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+    cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+
     for pt in range(len(refPt)-1):
       pt1 , pt2 = refPt[pt] , refPt[pt+1]
       cv2.line(image, (pt1[0],pt1[1]), (pt2[0],pt2[1]), [0,255,255], 3)      
@@ -39,17 +42,18 @@ while True:
     if key == ord("r"):
       image = clone.copy()
       refPt = []
+    elif key == ord("d"):
+      if len(refPt) > 2:
+        cropped = 1
+        vertices = np.array(refPt, np.int32)
+        image = roi(clone, [vertices])
+        cv2.imshow("ROI", image)
+        cap.set(1,start_frame)
+        fps = FPS().start()
+        print(refPt)
     elif key == ord("q"):
       break
 
-    if len(refPt) == 6:
-      cropped = 1
-      vertices = np.array(refPt, np.int32)
-      image = roi(clone, [vertices])
-      cv2.imshow("ROI", image)
-      cap.set(1,start_frame)
-      fps = FPS().start()
-      print(refPt)
   else:
     _,frame=cap.read()
     if _ == False:
