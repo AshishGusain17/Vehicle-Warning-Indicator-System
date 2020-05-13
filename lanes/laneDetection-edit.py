@@ -1,23 +1,5 @@
-#!/usr/bin/env python
 
-'''
 
-This program implements lane detection for a given monucular 
-video stream taken from a car. 
-
-Usage:
-
-Place the laneDetection.py file in the folder with the video 'challenge-video.mp4'
-or 'project-video.mp4'. Use Rviz to display an Image with topic - LaneThresholdVideo.
-
-Author:
-Rohitkrishna Nambiar
-rohit517@umd.edu
-University of Maryland, College Park  
-
-'''
-
-# Import Statements
 import numpy as np
 import cv2
 import sys
@@ -25,6 +7,7 @@ import sys
 # from sensor_msgs.msg import Image
 # from cv_bridge import CvBridge, CvBridgeError
 from sklearn import linear_model
+from imutils.video import FPS
 
 
 def extract_lane(road_lines):
@@ -354,62 +337,72 @@ def getGrayImage(rgbImage):
 
 
 
-## Main Function
 
-if __name__== "__main__":
 
-    #   Set video capture properties
-    cap = cv2.VideoCapture('../../videos/a.mp4')    
+cap = cv2.VideoCapture('../../videos/a.mp4')    
+fps = FPS().start()
 
-    #   Lane detection node. Topic - LaneThresholdVideo
-    # rospy.init_node('VideoStreamer', anonymous = True)
-    # LaneDetectionNode = rospy.Publisher('LaneThresholdVideo', Image, queue_size = 10)
 
-    #   Variables for deciding the color of Region of Interest
-    MASK_COLOR = 255
+#   Variables for deciding the color of Region of Interest
+MASK_COLOR = 255
 
-    #   Edge Detection Variables
-    EDGE_LOW = 50
-    EDGE_HIGH = 200
+#   Edge Detection Variables
+EDGE_LOW = 50
+EDGE_HIGH = 200
 
-    #   Line Parameters
-    MINIMUM_LENGTH = 20
-    MAXIMUM_LINE_GAP = 10
-    LINE_DRAW_OPTION = 0
+#   Line Parameters
+MINIMUM_LENGTH = 20
+MAXIMUM_LINE_GAP = 10
+LINE_DRAW_OPTION = 0
 
-    #   Execute while loop till video is open
-    while(cap.isOpened()):
-        ret, frame = cap.read()
+#   Execute while loop till video is open
+while(cap.isOpened()):
+    ret, frame = cap.read()
 
-        #Escape when no frame is captured / End of Video
-        if frame is None:
-            break
+    #Escape when no frame is captured / End of Video
+    if frame is None:
+        break
+    
+    #   Preprocess Image    
+    preProcessedImage, xsize, ysize = preProcessImage(frame)
+    cv2.imshow('preProcessedImage',preProcessedImage)
+
+    #   Extract the Region of Interest
+    roiExtractedImage = extractRegionOfInterest(preProcessedImage, MASK_COLOR)
+    cv2.imshow('roiExtractedImage',roiExtractedImage)
+
+    #   Use canny edge detection
+    edgeImage = cv2.Canny(roiExtractedImage, EDGE_LOW, EDGE_HIGH)
+    cv2.imshow('edgeImage',edgeImage)
+
+    #   Hough Line Draw
+    outputDetectFrame = drawLines(roiExtractedImage, MINIMUM_LENGTH, MAXIMUM_LINE_GAP, LINE_DRAW_OPTION)
+    
+    #   DIsplay image side by side
+    smallGray = cv2.resize(getGrayImage(frame), (0,0), fx=0.5, fy=0.5) 
+    smallThreshold = cv2.resize(roiExtractedImage, (0,0), fx=0.5, fy=0.5)     
+    combinedImage = np.hstack((smallGray, smallThreshold))
+
+    cv2.imshow('Image',combinedImage)
+    cv2.imshow('smallGray',smallGray)
+
+    cv2.imshow('smallThreshold',smallThreshold)
+
+
+    #   Publish Image
+    # outputframe = CvBridge().cv2_to_imgmsg(combinedImage, encoding="passthrough")
+    # LaneDetectionNode.publish(outputframe)
+
+    fps.update()
+    key=cv2.waitKey(100)
+    if key & 0xFF == ord("q"):
+        break
         
-        #   Preprocess Image    
-        preProcessedImage, xsize, ysize = preProcessImage(frame)
+# stop the timer and display FPS information
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+cap.release()
+# out1.release()
+cv2.destroyAllWindows() 
 
-        #   Extract the Region of Interest
-        roiExtractedImage = extractRegionOfInterest(preProcessedImage, MASK_COLOR)
-        
-        #   Use canny edge detection
-        edgeImage = cv2.Canny(roiExtractedImage, EDGE_LOW, EDGE_HIGH)
-
-        #   Hough Line Draw
-        outputDetectFrame = drawLines(roiExtractedImage, MINIMUM_LENGTH, MAXIMUM_LINE_GAP, LINE_DRAW_OPTION)
-        
-        #   DIsplay image side by side
-        smallGray = cv2.resize(getGrayImage(frame), (0,0), fx=0.5, fy=0.5) 
-        smallThreshold = cv2.resize(roiExtractedImage, (0,0), fx=0.5, fy=0.5)     
-        combinedImage = np.hstack((smallGray, smallThreshold))
-
-        cv2.imshow('Image',combinedImage)
-
-        #   Publish Image
-        # outputframe = CvBridge().cv2_to_imgmsg(combinedImage, encoding="passthrough")
-        # LaneDetectionNode.publish(outputframe)
-
-        if cv2.waitKey(30) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-cv2.destroyAllWindows()

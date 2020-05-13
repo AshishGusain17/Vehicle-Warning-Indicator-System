@@ -5,16 +5,32 @@ import imutils
 import time
 from sklearn.metrics import pairwise
 from PIL import ImageGrab
+from imutils.video import FPS
+import copy
 
-height , width , channels=0,0,0
+
+# def draw_lines(img, lines,store):
+# 	height , width = img.shape
+# 	try:
+# 		for line in lines:
+# 			coords = line[0]
+# 			cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)         # yellow color vertical
+# 	except:
+# 	    pass
+# 	    print("exception")
+# 	cv2.imshow("store",store)
+
 
 def draw_lines(img, lines,store):
+	height , width = img.shape
 	try:
 		for line in lines:
 			coords = line[0]
 			flag = 0 
 			if coords[2]==coords[0]:
 				slope=99
+				print("infinite slope")
+				cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)         # yellow color vertical
 			else:
 				slope=(coords[1]-coords[3])/(coords[2]-coords[0])
 				if -0.3 < slope < 0.3:
@@ -42,9 +58,8 @@ def draw_lines(img, lines,store):
 
 	except:
 	    pass
+	    print("exception")
 	cv2.imshow("store",store)
-	# cv2.imshow("later",img)
-
 
 
 def roi(img, vertices):
@@ -52,12 +67,13 @@ def roi(img, vertices):
     cv2.fillPoly(mask, vertices, 255)
     cv2.imshow("poly",mask)
     masked = cv2.bitwise_and(img, mask)
-
     return masked
+
+
 
 def process_img(image):
     # convert to gray
-    store=image
+    store = copy.deepcopy(image)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # edge detection
     image =  cv2.Canny(image, threshold1 = 200, threshold2=300)
@@ -72,7 +88,7 @@ def process_img(image):
 
     image = roi(image, [vertices])
 
-    lines = cv2.HoughLinesP(image, 1, np.pi/180, 180, np.array([]), minLineLength = 5, maxLineGap = 35)
+    lines = cv2.HoughLinesP(image, 1, np.pi/180, 180, np.array([]), minLineLength = 5, maxLineGap = 15)
     draw_lines(image,lines,store)
 
     return image
@@ -82,29 +98,35 @@ def process_img(image):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../../videos/c.mp4')
-cap.set(1,1700)
+cap=cv2.VideoCapture('../../videos/a.mp4')
+# cap.set(1,1700)
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
 
+fps = FPS().start()
 
 
-def screen_record(): 
-	last_time = time.time()
-	while(True):
-		_ , screen =  cap.read()
-		global height , width , channels
-		height, width, channels = screen.shape
-		cv2.imshow('original', screen )
+last_time = time.time()
+while(True):
+	_ , screen =  cap.read()
+	cv2.imshow('original', screen )
 
-		new_screen = process_img(screen)
-		# print('loop took {} seconds'.format(time.time()-last_time))
-		# last_time = time.time()
-		cv2.imshow('later', new_screen )
-		if cv2.waitKey(25) & 0xFF == ord('q'):
-		    cv2.destroyAllWindows()
-		    cap.release()
-		    break
+	new_screen = process_img(screen)
+	# print('loop took {} seconds'.format(time.time()-last_time))
+	# last_time = time.time()
+	cv2.imshow('later', new_screen )
+	fps.update()
+
+	key=cv2.waitKey(1)
+	if key & 0xFF == ord("q"):
+		break
+        
+# stop the timer and display FPS information
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+cap.release()
+# out1.release()
+cv2.destroyAllWindows() 
 
 
-screen_record()

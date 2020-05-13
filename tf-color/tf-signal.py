@@ -230,7 +230,7 @@ while True:
 
     # out1.write(frame)
     fps.update()
-    key=cv2.waitKey(1)
+    key=cv2.waitKey(100)
     if key & 0xFF == ord("q"):
         break
         
