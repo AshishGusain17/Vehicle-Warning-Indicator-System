@@ -8,15 +8,13 @@ import six.moves.urllib as urllib
 import sys
 import tensorflow as tf
 import pathlib
-from collections import defaultdict
-from matplotlib import pyplot as plt
 import cv2
 import imutils
 import time
 from sklearn.metrics import pairwise
 from imutils.video import FPS
 import copy
-from PIL import Image
+import pathlib
 
 
 
@@ -169,9 +167,9 @@ def tracking(indexesCars , boxesCars , image_np):
             xx1, yy1, xx2, yy2, label = i
             prev_frame.append([xx1, yy1, xx2, yy2, number, 0])
 
-            cv2.rectangle(img, (xx1, yy1), (xx2, yy2), color, 2)
+            cv2.rectangle(image_np, (xx1, yy1), (xx2, yy2), color, 2)
             text=' '+str(number)
-            cv2.putText(img, text, (xx1, yy1 + 30), font, 3, color, 2)
+            cv2.putText(image_np, text, (xx1, yy1 + 30), font, 3, color, 2)
 
 
     # print(number , len(prev_frame),len(curr_frame))
@@ -261,7 +259,7 @@ def show_inference(model, image_path):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/a.mp4')
+cap=cv2.VideoCapture('../videos/b.mp4')
 time.sleep(2.0)
 
 cap.set(1,100)

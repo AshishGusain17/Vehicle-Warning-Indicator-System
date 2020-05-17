@@ -4,6 +4,14 @@ import imutils
 import time
 from imutils.video import FPS
 from sklearn.metrics import pairwise
+import numpy as np
+import os
+import six.moves.urllib as urllib
+import sys
+import tensorflow as tf
+import pathlib
+from collections import defaultdict
+import copy
 
 
 
@@ -31,7 +39,7 @@ def confirm_day_or_night(frame , flag_night_counter):
       pixel_len = pixel_len + len(i)
     ratio = pixel_ct / pixel_len
     print("ratio = ",ratio)
-    if ratio < 0.55:
+    if ratio < 0.68:
         flag_night_counter = flag_night_counter + 1
         return flag_night_counter
     else:
@@ -41,7 +49,7 @@ def confirm_day_or_night(frame , flag_night_counter):
 
 # cap=cv2.VideoCapture(0)
 cap=cv2.VideoCapture('../videos/a.mp4')
-set_pos=292*25
+set_pos=25*25
 cap.set(1,set_pos)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))

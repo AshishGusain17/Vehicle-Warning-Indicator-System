@@ -1,14 +1,20 @@
 import numpy as np
 import os
-import six.moves.urllib as urllib
 import sys
 import tensorflow as tf
+from imutils.video import VideoStream
+import six.moves.urllib as urllib
+import cv2
+import imutils
+import time
+from imutils.video import FPS
+from sklearn.metrics import pairwise
+import copy
 import pathlib
 from collections import defaultdict
-from matplotlib import pyplot as plt
-from PIL import Image
 
-# sys.path.append('../../research')
+
+sys.path.append('../')
 
 
 from utils import ops as utils_ops
@@ -19,14 +25,14 @@ from utils import visualization_utils as vis_util
 
 utils_ops.tf = tf.compat.v1
 tf.gfile = tf.io.gfile
-PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
+PATH_TO_LABELS = '../../bigdata/data/mscoco_label_map.pbtxt'
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
 
 
 model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
-model_dir =  "../bigdata/models/" + model_name + "/saved_model"
+model_dir =  "../../bigdata/models/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
 
@@ -131,7 +137,7 @@ from sklearn.metrics import pairwise
 from imutils.video import FPS
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/a.mp4')
+cap=cv2.VideoCapture('../../videos/a.mp4')
 time.sleep(2.0)
 
 cap.set(1,190*25)

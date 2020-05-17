@@ -8,16 +8,16 @@ from PIL import ImageGrab
 from imutils.video import FPS
 import copy
 
-# def draw_lines(img, lines,store):
-# 	height , width = img.shape
-# 	try:
-# 		for line in lines:
-# 			coords = line[0]
-# 			cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)         # yellow color vertical
-# 	except:
-# 	    pass
-# 	    print("exception")
-# 	cv2.imshow("store",store)
+def all_lines(img, lines,store):
+  height , width = img.shape
+  try:
+    for line in lines:
+      coords = line[0]
+      cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 3)         # yellow color vertical
+  except:
+      pass
+      print("exception")
+  cv2.imshow("store",store)
 
 
 def click_and_crop(event, x, y, flags, param):
@@ -49,24 +49,25 @@ def draw_lines(img, lines,store):
         slope=(coords[1]-coords[3])/(coords[2]-coords[0])
         if -0.3 < slope < 0.3:
           cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [255,0,0], 2)           # blue color horizontal
-        else:
-          if slope < 0:
-            if (coords[0] + coords[2])/2 < width//2 < max([coords[0],coords[2]]):
-              flag=1 
-              slope=str(slope)[:5]
-              cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
-              cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-              cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+        elif slope < 0:
+          # if (coords[0] + coords[2])/2 < width//2 < max([coords[0],coords[2]]):
+          if min([coords[0] , coords[2]]) < width//2 < max([coords[0],coords[2]]):
+            flag=1 
+            slope=str(slope)[:5]
+            cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+            cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
+            cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
 
-          else:
-            if (coords[0] + coords[2])/2 < width//2 < min([coords[0],coords[2]]):
-              flag=1 
-              slope=str(slope)[:5]
-              cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
-              cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-              cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+        elif slope > 0:
+          # if (coords[0] + coords[2])/2 > width//2 > min([coords[0],coords[2]]):
+          if max([coords[0],coords[2]]) > width//2 > min([coords[0],coords[2]]):
+            flag=1 
+            slope=str(slope)[:5]
+            cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+            cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
+            cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
 
-          if flag != 1:
+          if flag == 0:
             slope=str(slope)[:5]
             cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
             cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 2)         # yellow color vertical
@@ -88,20 +89,25 @@ def process_img(image):
     image =  cv2.Canny(image, threshold1 = 200, threshold2=300)
     image = cv2.GaussianBlur(image,(3,3),0)
 
-    # vertices = np.array(refPt, np.int32)
-    vertices = np.array([[197, 537], [593, 339], [725, 335], [1271, 365], [1271, 592], [184, 550]], np.int32)
+    vertices = np.array(lanePointer, np.int32)
+    # vertices = np.array([[172, 545], [481, 399], [974, 356], [1274, 376], [1276, 540]], np.int32)
     image = roi(image, [vertices])
+    cv2.imshow("canny",image)
 
     lines = cv2.HoughLinesP(image, 1, np.pi/180, 180, np.array([]), minLineLength = 5, maxLineGap = 5)
     draw_lines(image,lines,store)
+    # all_lines(image,lines,store)
+
     return image
     
 
-def selectRegions(image , cropped , str , key):
-    global refPt
+def selectRegions(image  , text , flag):
+    global refPt , cropped
+    clone = copy.deepcopy(image)
     while True:
+      key = cv2.waitKey(1) & 0xFF
       # display the image and wait for a keypress
-      cv2.putText(image, str ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+      cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
       cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
       cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
 
@@ -111,51 +117,60 @@ def selectRegions(image , cropped , str , key):
 
       cv2.imshow("ROI", image)
       if key == ord("r"):
-        image = clone.copy()
+        image = copy.deepcopy(clone)
         refPt = []
       elif key == ord("d"):
         if len(refPt) > 2:
-          cropped = 1
+          cropped = flag
           vertices = np.array(refPt, np.int32)
           image = roi(clone, [vertices])
           cv2.imshow("ROI", image)
           cap.set(1,start_frame)
-          fps = FPS().start()
-          print(refPt)
+          return 
       elif key == ord('q'):
-        break
+        return 1
+
 
 refPt = []
 cropped = 0
 cap=cv2.VideoCapture('../../videos/d.mp4')
-start_frame = 1500
+start_frame = 220*24
 cap.set(1,start_frame)
 _ , image = cap.read()
-clone = copy.deepcopy(image)
 cv2.namedWindow("ROI")
 cv2.setMouseCallback("ROI", click_and_crop)
 ctt = 0
+Quit = 0
+
+
 while True:
   key = cv2.waitKey(1) & 0xFF
   if cropped == 0:
-    selectRegions(image , cropped , "Click points to select region of interset" ,key)
-    print(1)
+    Quit = selectRegions(copy.deepcopy(image)  , "Click points to select region of interset" , 1)
+    roiPointer = refPt
+    refPt = []
+    print(roiPointer)
   elif cropped == 1:
-    selectRegions(image , cropped , "Click points to select bird's eye view",key)
+    Quit = selectRegions(copy.deepcopy(image)  , "Click points to select bird's eye view" , 2)
+    lanePointer = refPt
+    print(lanePointer)
+    fps = FPS().start()
   else:
-    ctt = ctt + 1
-    print(ctt)
-    _,frame=cap.read()
+    _,frame = cap.read()
     if _ == False:
       break
+    ctt = ctt + 1
+    print(ctt)
 
     new_screen = process_img(frame)
     cv2.imshow("frame",frame)
     fps.update()
-  if key == ord('q'):
+    if key == ord('q'):
+      fps.stop()
+      print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+      print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+      break
+  if Quit:
     break
-fps.stop()
-print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cv2.destroyAllWindows()
 cap.release()
