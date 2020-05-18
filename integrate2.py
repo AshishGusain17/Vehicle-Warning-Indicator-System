@@ -61,46 +61,41 @@ def click_and_crop(event, x, y, flags, param):
 
 
 
-def selectRegions(image  , text , flag):
-    global refPt , cropped
-    clone = copy.deepcopy(image)
-    while True:
-        key = cv2.waitKey(1) & 0xFF
-        # display the image and wait for a keypress
-        cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
 
-        for pt in range(len(refPt)-1):
-            pt1 , pt2 = refPt[pt] , refPt[pt+1]
-            cv2.line(image, (pt1[0],pt1[1]), (pt2[0],pt2[1]), [0,255,255], 3)      
 
-        cv2.imshow("ROI", image)
-        if key == ord("r"):
-            image = copy.deepcopy(clone)
-            refPt = []
-        elif key == ord("d"):
-            if flag == 1:
-                cropped = flag
-                cap.set(1,start_frame)
-                return 
-            elif flag == 2 and len(refPt) > 2:
-                cropped = flag
-                cap.set(1,start_frame)
-                return 
-        elif key == ord('q'):
-            return 1
+def confirm_day_or_night(frame , flag_night_counter):
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, blackLower , blackUpper)
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask , None, iterations=2)
+    # cv2.imshow('black',imutils.resize(mask,width=250))
+    # cv2.imshow('frame',frame)
+    pixel_ct = 0
+    pixel_len = 0
+    for i in mask:
+      pixel_ct = pixel_ct + np.sum(i==0)
+      pixel_len = pixel_len + len(i)
+    ratio = pixel_ct / pixel_len
+    print("ratio = ",ratio)
+    if ratio < 0.6:
+        flag_night_counter = flag_night_counter + 1
+        return flag_night_counter
+    else:
+        flag_night_counter = flag_night_counter - 1 
+        return flag_night_counter
 
 
 
 
-def show_inference(model, image_path):
-    image_np = np.array(image_path)
+
+def show_inference(dashPointer , lanePointer , frame):
+    image_np = np.array(frame)
     lane_image = copy.deepcopy(image_np)
     height,width,channel = image_np.shape
 
 
-    output_dict = functions.get_dict(dashPointer , model , image_np)
+    output_dict = functions.get_dict(dashPointer , detection_model , image_np)
 
     confidencesCars , boxesCars , confidencesLights , boxesLights , confidencesPersons , boxesPersons = functions.findBoxes(image_np , output_dict)
 
@@ -124,40 +119,123 @@ def show_inference(model, image_path):
 
 
 
-def confirm_day_or_night(frame , flag_night_counter):
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, blackLower , blackUpper)
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask , None, iterations=2)
-    # cv2.imshow('black',imutils.resize(mask,width=250))
-    # cv2.imshow('frame',frame)
-    pixel_ct = 0
-    pixel_len = 0
-    for i in mask:
-      pixel_ct = pixel_ct + np.sum(i==0)
-      pixel_len = pixel_len + len(i)
-    ratio = pixel_ct / pixel_len
-    # print("ratio = ",ratio)
-    if ratio < 0.6:
-        flag_night_counter = flag_night_counter + 1
-        return flag_night_counter
-    else:
-        flag_night_counter = flag_night_counter - 1 
-        return flag_night_counter
+def selectRegions(image  , text , flag):
+    global refPt
+    clone = copy.deepcopy(image)
+    while True:
+        key = cv2.waitKey(1) & 0xFF
+        # display the image and wait for a keypress
+        cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+        cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+        cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+
+        for pt in range(len(refPt)-1):
+            pt1 , pt2 = refPt[pt] , refPt[pt+1]
+            cv2.line(image, (pt1[0],pt1[1]), (pt2[0],pt2[1]), [0,255,255], 3)      
+
+        cv2.imshow("ROI", image)
+        if key == ord("r"):
+            image = copy.deepcopy(clone)
+            refPt = []
+        elif key == ord("d"):
+            if flag == 1:
+                return 0
+            elif flag == 2 and len(refPt) > 2:
+                return 0
+        elif key == ord('q'):
+            return 1
 
 
+
+
+
+
+
+def night():
+    global refPt
+    _ , image = cap.read()
+    ctt = 0
+
+    Quit = selectRegions(image  , "Click points to select your vehicle dash." , 1)
+    dashPointer = refPt
+    if len(dashPointer) <= 2:
+        dashPointer = [[0,0], [0,0], [0,0]]
+    refPt = []
+    print("For dash: ",dashPointer)
+    if Quit == 1:
+        return
+    cv2.destroyWindow("ROI")
+
+    fps = FPS().start()
+    while True:
+        _,frame = cap.read()
+        if _ == False:
+            break
+
+        # print(ctt ,fps._numFrames)
+        # ctt = ctt + 1
+        break_light_utils.break_light(dashPointer , frame)
+
+        # cv2.imshow("original",frame)
+        key = cv2.waitKey(1) & 0xFF
+        fps.update()
+        if key == ord('q'):
+            break
+    fps.stop()
+    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
+
+
+
+def day():
+    global refPt
+    _ , image = cap.read()
+    ctt = 0
+
+    Quit = selectRegions(copy.deepcopy(image)  , "Click points to select your vehicle dash." , 1)
+    dashPointer = refPt
+    if len(dashPointer) <= 2:
+        dashPointer = [[0,0], [0,0], [0,0]]
+    refPt = []
+    print("For dash: ",dashPointer)
+    if Quit == 1:
+        return
+
+    Quit = selectRegions(copy.deepcopy(image)  , "Click points to select bird's eye view." , 2)
+    lanePointer = refPt
+    print("For lanes: ",lanePointer)
+    if Quit == 1:
+        return
+
+    cv2.destroyWindow("ROI")
+
+    fps = FPS().start()
+    while True:
+        _,frame = cap.read()
+        if _ == False:
+            break
+        # print(ctt ,fps._numFrames)
+        # ctt = ctt + 1
+
+        show_inference(dashPointer , lanePointer , frame)
+
+        # cv2.imshow("original",frame)
+        key = cv2.waitKey(1) & 0xFF
+        fps.update()
+        if key == ord('q'):
+            break
+
+    fps.stop()
+    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 
 
 
 
 refPt = []                  # to store refernece pointers
-cropped = 0                 # will change whenever d is pressed
-ctt = 0                     # frame count
-Quit = 0                    # quit while dash and lane points are selected
 flag_night_counter = 0      # counter to count night frames
-flagConfirm = 0             # check whether confirmation (day/night) or frame processing is done
 
 cap=cv2.VideoCapture('../videos/a.mp4')
 start_frame = 150*25
@@ -166,84 +244,19 @@ _ , image = cap.read()
 cv2.namedWindow("ROI")
 cv2.setMouseCallback("ROI", click_and_crop)
 
-while True:
+for z in range(10):
     (grabbed, frame) = cap.read()
     height,width,channel = frame.shape
-    if flagConfirm == 0:
-        for z in range(10):
-            flag_night_counter = confirm_day_or_night(frame , flag_night_counter)
-        print("flag_night_counter = ",flag_night_counter)
-        cap.set(1 , start_frame)
-        flagConfirm = 1
-    else:
-        if flag_night_counter > 4:
-            key = cv2.waitKey(1) & 0xFF
-            if cropped == 0:
-                Quit = selectRegions(copy.deepcopy(image)  , "Click points to select your vehicle dash." , 1)
-                cv2.destroyWindow("ROI")
-                dashPointer = refPt
-                if len(dashPointer) <= 2:
-                    dashPointer = [[0,0], [0,0], [0,0]]
-                refPt = []
-                print("For dash: ",dashPointer)
-                fps = FPS().start()
-            else:
-                _,frame = cap.read()
-                if _ == False:
-                    fps.stop()
-                    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-                    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-                    break
-                # print(ctt ,fps._numFrames)
-                ctt = ctt + 1
+    flag_night_counter = confirm_day_or_night(frame , flag_night_counter)
+print("flag_night_counter = ",flag_night_counter)
+cap.set(1 , start_frame)
 
-                break_light_utils.break_light(dashPointer , frame)
+if flag_night_counter > 4:
+    night()
+else:
+    day()
 
-                # cv2.imshow("original",frame)
-                fps.update()
-                if key == ord('q'):
-                    fps.stop()
-                    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-                    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-                    break
-            if Quit:
-                break
-        else:                                                                                                   # DAY TIME
-            key = cv2.waitKey(1) & 0xFF
-            if cropped == 0:
-                Quit = selectRegions(copy.deepcopy(image)  , "Click points to select your vehicle dash." , 1)
-                dashPointer = refPt
-                if len(dashPointer) <= 2:
-                    dashPointer = [[0,0], [0,0], [0,0]]
-                refPt = []
-                print("For dash: ",dashPointer)
-            elif cropped == 1:
-                Quit = selectRegions(copy.deepcopy(image)  , "Click points to select bird's eye view." , 2)
-                cv2.destroyWindow("ROI")
-                lanePointer = refPt
-                print("For lanes: ",lanePointer)
-                fps = FPS().start()
-            else:
-                _,frame = cap.read()
-                if _ == False:
-                    fps.stop()
-                    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-                    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-                    break
-                # print(ctt ,fps._numFrames)
-                ctt = ctt + 1
 
-                show_inference(detection_model, frame)
-
-                # cv2.imshow("original",frame)
-                fps.update()
-                if key == ord('q'):
-                    fps.stop()
-                    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-                    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-                    break
-            if Quit:
-                break
 
 cv2.destroyAllWindows()
 cap.release()

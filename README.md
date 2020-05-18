@@ -1,4 +1,5 @@
 # Vehicle-Warning-Indicator-System
+A deep learning and computer vision based warning system for vehicle drivers using live dash-cam footages.
 
 ### Dependencies required:
 * Python 3.0
@@ -11,6 +12,7 @@
 * **tracked**: This folder contains detection and tracking algorithm for the vehicles.
 * **untracked**: Detection and visualization only
 * **utils**: contains various functions that are used continuously again and again for different frames.
+* **estimates**: Detect pedestrians and vehicles too close to us that may cause collision.
 * **cropping**: Cropping frames using drag and drop or clicking points.
 
 ###  Requisities:
