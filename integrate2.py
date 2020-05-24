@@ -41,7 +41,7 @@ detection_model = detection_model.signatures['serving_default']
 
 # print(category_index)
 colors = np.random.uniform(0, 255, size=(len(category_index), 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 blackLower = (0 , 0 , 0)
 blackUpper = (180 , 255 , 35)
 
@@ -49,7 +49,10 @@ print(detection_model.inputs)
 print(detection_model.output_dtypes)
 print(detection_model.output_shapes)
 
-  
+
+
+
+
 
 
 
@@ -108,7 +111,7 @@ def show_inference(dashPointer , lanePointer , frame):
     image_np = estimate_collide_utils.estimate_collide(indexesCars , boxesCars , image_np)
     image_np = estimate_stepping_utils.estimate_stepping(indexesPersons , boxesPersons , image_np)
 
-    cv2.putText(image_np,"DAY",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)
+    cv2.putText(image_np,"DAY",(width - 200 ,50), font, 1.2, (167,133,0) , 2 , cv2.LINE_AA)
 
     image_np = lane_detection_utils.draw_lines(lanePointer , lane_image , image_np)
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
@@ -125,9 +128,9 @@ def selectRegions(image  , text , flag):
     while True:
         key = cv2.waitKey(1) & 0xFF
         # display the image and wait for a keypress
-        cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+        cv2.putText(image, text ,  (240,30), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
+        cv2.putText(image, "Press 'r' key to reset everything.",  (290,70), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
+        cv2.putText(image, "Press 'd' key if the region selection is done.",  (180,110), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
 
         for pt in range(len(refPt)-1):
             pt1 , pt2 = refPt[pt] , refPt[pt+1]
@@ -154,6 +157,8 @@ def selectRegions(image  , text , flag):
 def night():
     global refPt
     _ , image = cap.read()
+    image=imutils.resize(image, width=1280)
+
     ctt = 0
 
     Quit = selectRegions(image  , "Click points to select your vehicle dash." , 1)
@@ -169,6 +174,8 @@ def night():
     fps = FPS().start()
     while True:
         _,frame = cap.read()
+        frame=imutils.resize(frame, width=1280)
+
         if _ == False:
             break
 
@@ -191,6 +198,8 @@ def night():
 def day():
     global refPt
     _ , image = cap.read()
+    image=imutils.resize(image, width=1280)
+
     ctt = 0
 
     Quit = selectRegions(copy.deepcopy(image)  , "Click points to select your vehicle dash." , 1)
@@ -237,16 +246,19 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/a.mp4')
-start_frame = 150*25
+cap=cv2.VideoCapture('../videos/l.mp4')
+start_frame = 54*30
 cap.set(1,start_frame)
 _ , image = cap.read()
+image=imutils.resize(image, width=1280)
 cv2.namedWindow("ROI")
 cv2.setMouseCallback("ROI", click_and_crop)
 
 for z in range(10):
     (grabbed, frame) = cap.read()
+    frame=imutils.resize(frame, width=1280)
     height,width,channel = frame.shape
+
     flag_night_counter = confirm_day_or_night(frame , flag_night_counter)
 print("flag_night_counter = ",flag_night_counter)
 cap.set(1 , start_frame)

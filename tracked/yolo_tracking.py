@@ -35,7 +35,8 @@ def iou(boxA, boxB):
     return iou
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../../videos/i.mp4')
+cap=cv2.VideoCapture('../../videos/a.mp4')
+cap.set(1,0)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
 fps = FPS().start()
@@ -45,10 +46,13 @@ number=0
 cot=0
 while True:
     _,img=cap.read()
-    # if cot<120:
-    # 	cot=cot+1
-    # 	print(cot)
-    # 	continue
+    cot=cot+1
+    if cot==8:
+        cap.set(1,120)
+    if cot==10:
+        cap.set(1,160)
+    if cot==12:
+        cap.set(1,180)
     height, width, channels = img.shape
 
     # Detecting objects
@@ -80,7 +84,7 @@ while True:
 	                # Rectangle coordinates
 	                x = int(center_x - w / 2)
 	                y = int(center_y - h / 2)
-	                if (w*h >=800):
+	                if (w*h >=1800):
 		                boxes.append([x, y, w, h])
 		                confidences.append(float(confidence))
 		                class_ids.append(class_id)

@@ -48,8 +48,9 @@ def confirm_day_or_night(frame , flag_night_counter):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/a.mp4')
-set_pos=25*25
+cap=cv2.VideoCapture('../videos/l.mp4')
+set_pos=54*30
+
 cap.set(1,set_pos)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
@@ -60,7 +61,9 @@ flag_night_counter = 0
 initial_flag = 0
 while True:
     (grabbed, frame) = cap.read()
+    frame=imutils.resize(frame, width=1280)
     height,width,channel = frame.shape
+    # print(frame.shape)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     if initial_flag == 0:
@@ -82,9 +85,12 @@ while True:
             # cv2.imshow('Red',imutils.resize(maskRed,width=250))
 
             (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
             hull = []
+            indHull = []
             for i in range(len(contours)):
-                chull = cv2.convexHull(contours[i], False)
+                contourVar = contours[i]
+                chull = cv2.convexHull(contourVar , False)
                 extreme_top    = tuple(chull[chull[:, :, 1].argmin()][0])
                 extreme_bottom = tuple(chull[chull[:, :, 1].argmax()][0])
                 extreme_left   = tuple(chull[chull[:, :, 0].argmin()][0])
@@ -94,23 +100,22 @@ while True:
                 distance = pairwise.euclidean_distances([(cX, cY)], Y=[extreme_left, extreme_right, extreme_top, extreme_bottom])[0]
                 radius = int(distance[distance.argmax()])
 
+                hull.append(chull)
                 if radius >15:
-                    cv2.circle(frame, (int(cX), int(cY)), int(radius),(167,133,0), 2)
-                    hull.append(chull)
+                    # cv2.circle(frame, (int(cX), int(cY)), int(radius),(167,133,0), 2)
+                    indHull.append(i)
                     cv2.putText(frame,"Let me show you brake-lights radiations patches.",(170 ,80), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
                     cv2.putText(frame,"Apply brakes accordingly.",(330 ,120), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
 
 
-            print("length = ",len(hull))
+            # print(indHull , len(indHull))
 
             # draw contours and hull points
-            for i in range(len(hull)):
-                color_contours = (0, 255, 0) # green - color for contours
-                color = (0, 255, 255) # blue - color for convex hull
+            for i in indHull:
                 # draw ith contour
-                cv2.drawContours(frame, contours, i, color_contours, 1, 8, hierarchy)
+                cv2.drawContours(frame, contours, i, (0, 255, 0), 1, 8, hierarchy)
                 # draw ith convex hull object
-                cv2.drawContours(frame, hull, i, color, 2, 8)    
+                cv2.drawContours(frame, hull, i, (0, 255, 255), 2, 8)    
         else:                                                                                                   # DAY TIME
             cv2.putText(frame,"DAY",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)
 
@@ -137,6 +142,9 @@ cv2.destroyAllWindows()
 # d.mp4(24fps) 195*24   419*24
 # e.mp4(24fps) 47  283    338
 # f.mp4(24fps) 36  223
+# j.mp4(30fps)    false results
+# k.mp4(30fps) blbwcv
+# l.mp4(30fps)   54
 
 # startRedLower = (0 , 150 , 50)
 # startRedUpper = (15 , 255, 255)

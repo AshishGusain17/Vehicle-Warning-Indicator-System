@@ -13,7 +13,7 @@ import pathlib
 from collections import defaultdict
 
 colors = np.random.uniform(0, 255, size=(100, 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 startRedLower = (0 , 180 , 90)
@@ -44,6 +44,7 @@ def break_light(dashPointer , image_np):
 
 	(_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	hull = []
+	indHull = []
 	for i in range(len(contours)):
 		chull = cv2.convexHull(contours[i], False)
 		extreme_top    = tuple(chull[chull[:, :, 1].argmin()][0])
@@ -54,17 +55,17 @@ def break_light(dashPointer , image_np):
 		cY = int((extreme_top[1] + extreme_bottom[1]) / 2)
 		distance = pairwise.euclidean_distances([(cX, cY)], Y=[extreme_left, extreme_right, extreme_top, extreme_bottom])[0]
 		radius = int(distance[distance.argmax()])
-
+		hull.append(chull)
 		if radius >15:
 			# cv2.circle(image_np, (int(cX), int(cY)), int(radius),(167,133,0), 2)
-			hull.append(chull)
-			cv2.putText(image_np,"Let me show you brake-lights radiations patches.",(170 ,80), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
-			cv2.putText(image_np,"Apply brakes accordingly.",(330 ,120), font, 1.2,(0, 255, 255),2,cv2.LINE_AA)
+			indHull.append(i)
+			cv2.putText(image_np,"Let me show you brake-lights radiations patches.",(170 ,80),  font, 1.2 , (0, 255, 255) , 2 , cv2.LINE_AA)
+			cv2.putText(image_np,"Apply brakes accordingly.",                       (390 ,120), font, 1.2 , (0, 255, 255) , 2 , cv2.LINE_AA)
 
 
 	# print("length = ",len(hull))
 
-	for i in range(len(hull)):
+	for i in indHull:
 		color_contours = (0, 255, 0) # green - color for contours
 		color = (0, 255, 255) # blue - color for convex hull
 		# draw ith contour
@@ -72,7 +73,7 @@ def break_light(dashPointer , image_np):
 		# draw ith convex hull object
 		cv2.drawContours(image_np, hull, i, color, 2, 8) 
 
-	cv2.putText(image_np,"NIGHT",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
+	cv2.putText(image_np,"NIGHT",(width - 200 ,50), font, 1.2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
 	cv2.imshow("finally" , image_np)
 
 
@@ -83,3 +84,6 @@ def break_light(dashPointer , image_np):
 # d.mp4(24fps) 195*24   419*24
 # e.mp4(24fps) 47  283    338
 # f.mp4(24fps) 36  223
+# j.mp4(30fps)    false results
+# k.mp4(30fps) blbwcv
+# l.mp4(30fps)   54
