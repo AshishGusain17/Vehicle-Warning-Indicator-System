@@ -41,7 +41,7 @@ detection_model = detection_model.signatures['serving_default']
 
 # print(category_index)
 colors = np.random.uniform(0, 255, size=(len(category_index), 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 blackLower = (0 , 0 , 0)
 blackUpper = (180 , 255 , 35)
 
@@ -67,9 +67,9 @@ def selectRegions(image  , text , flag):
     while True:
         key = cv2.waitKey(1) & 0xFF
         # display the image and wait for a keypress
-        cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-        cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+        cv2.putText(image, text ,  (60,30), font, 1.2, [0,255,255], 2 , cv2.LINE_AA)
+        cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), font , 1.2, [0,255,255], 2 , cv2.LINE_AA)
+        cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
 
         for pt in range(len(refPt)-1):
             pt1 , pt2 = refPt[pt] , refPt[pt+1]

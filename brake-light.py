@@ -120,7 +120,6 @@ while True:
             cv2.putText(frame,"DAY",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)
 
 
-
         fps.update()
     cv2.imshow("Frame", frame)
     if cv2.waitKey(100) & 0xFF == ord("q"):

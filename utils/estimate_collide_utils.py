@@ -13,7 +13,7 @@ import pathlib
 from collections import defaultdict
 
 colors = np.random.uniform(0, 255, size=(100, 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 # crash_count_frames are vehicle warning variables

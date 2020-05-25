@@ -73,7 +73,7 @@ def break_light(dashPointer , image_np):
 		# draw ith convex hull object
 		cv2.drawContours(image_np, hull, i, color, 2, 8) 
 
-	cv2.putText(image_np,"NIGHT",(width - 200 ,50), font, 1.2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
+	cv2.putText(image_np,"NIGHT",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
 	cv2.imshow("finally" , image_np)
 
 

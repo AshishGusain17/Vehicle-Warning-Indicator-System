@@ -71,7 +71,7 @@ def estimate_collide(output_dict,height,width,image_np):
     if max_curr_obj_area <= 100000:
       cv2.putText(image_np,"YOU ARE GETTING CLOSER" ,(50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
     elif max_curr_obj_area > 100000:
-      cv2.putText(image_np,"DON'T COLLIDE !!!" ,(50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
+      cv2.putText(image_np,"DON'T COLLIDE !!!" ,     (50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
 
 
 

@@ -13,7 +13,7 @@ import pathlib
 from collections import defaultdict
 
 colors = np.random.uniform(0, 255, size=(100, 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 
@@ -43,7 +43,7 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 			xmin, ymin, w, h = box
 			boxArea = w * h
 			cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
-			cv2.putText(image_np, str(boxArea),  (xmin, ymin), cv2.FONT_HERSHEY_PLAIN, 2, [0,0,0], 3)
+			cv2.putText(image_np, str(boxArea),  (xmin, ymin), font , 2, [0,0,0], 3)
 			if boxArea > areaPerson:
 				areaPerson = boxArea
 		areaDetails = details
@@ -52,7 +52,7 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 		for box in areaDetails:
 			xmin, ymin, w, h = box
 			cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
-			cv2.putText(image_np, str(areaPerson),  (xmin, ymin), cv2.FONT_HERSHEY_PLAIN, 2, [0,0,0], 3)
+			cv2.putText(image_np, str(areaPerson),  (xmin, ymin), font , 2, [0,0,0], 3)
 
 		if areaPerson > 15000:
 		  cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " + str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)

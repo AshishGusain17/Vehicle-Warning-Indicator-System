@@ -8,6 +8,8 @@ from PIL import ImageGrab
 from imutils.video import FPS
 import copy
 
+font = FONT_HERSHEY_SIMPLEX
+
 def all_lines(img, lines,store):
   height , width = img.shape
   try:
@@ -54,22 +56,22 @@ def draw_lines(img, lines,store):
           if min([coords[0] , coords[2]]) < width//2 < max([coords[0],coords[2]]):
             flag=1 
             slope=str(slope)[:5]
-            cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+            cv2.putText(store, str(slope),  (coords[0],coords[1]), font , 3, [122,32,12], 2)
             cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-            cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+            cv2.putText(store, "get to your lane" ,  (40,40), font , 3, [23,64,21], 3)
 
         elif slope > 0:
           # if (coords[0] + coords[2])/2 > width//2 > min([coords[0],coords[2]]):
           if max([coords[0],coords[2]]) > width//2 > min([coords[0],coords[2]]):
             flag=1 
             slope=str(slope)[:5]
-            cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+            cv2.putText(store, str(slope),  (coords[0],coords[1]), font , 3, [122,32,12], 2)
             cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-            cv2.putText(store, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+            cv2.putText(store, "get to your lane" ,  (40,40), font , 3, [23,64,21], 3)
 
           if flag == 0:
             slope=str(slope)[:5]
-            cv2.putText(store, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+            cv2.putText(store, str(slope),  (coords[0],coords[1]), font , 3, [122,32,12], 2)
             cv2.line(store, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 2)         # yellow color vertical
 
 
@@ -107,9 +109,9 @@ def selectRegions(image  , text , flag):
     while True:
       key = cv2.waitKey(1) & 0xFF
       # display the image and wait for a keypress
-      cv2.putText(image, text ,  (60,30), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-      cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
-      cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), cv2.FONT_HERSHEY_PLAIN, 2, [0,255,255], 3)
+      cv2.putText(image, text ,  (60,30), font , 2, [0,255,255], 3)
+      cv2.putText(image, "Press 'r' key to reset everything.",  (60,70), font , 2, [0,255,255], 3)
+      cv2.putText(image, "Press 'd' key if the region selection is done.",  (60,110), font , 2, [0,255,255], 3)
 
       for pt in range(len(refPt)-1):
         pt1 , pt2 = refPt[pt] , refPt[pt+1]

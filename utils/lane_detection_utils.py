@@ -13,7 +13,7 @@ from collections import defaultdict
 
 
 colors = np.random.uniform(0, 255, size=(100, 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 
@@ -67,22 +67,22 @@ def draw_lines(lanePointer , lane_image , image_np):
                     if min([coords[0] , coords[2]]) < width//2 < max([coords[0],coords[2]]):
                         flag=1 
                         slope=str(slope)[:5]
-                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), font, 3, [122,32,12], 2)
                         cv2.line(lane_image, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-                        cv2.putText(lane_image, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+                        cv2.putText(lane_image, "get to your lane" ,  (40,40), font , 3, [23,64,21], 3)
 
                 elif slope > 0:
                     # if (coords[0] + coords[2])/2 > width//2 > min([coords[0],coords[2]]):
                     if max([coords[0],coords[2]]) > width//2 > min([coords[0],coords[2]]):
                         flag=1 
                         slope=str(slope)[:5]
-                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), font, 3, [122,32,12], 2)
                         cv2.line(lane_image, (coords[0],coords[1]), (coords[2],coords[3]), [0,0,0], 2)         # black color vertical
-                        cv2.putText(lane_image, "get to your lane" ,  (40,40), cv2.FONT_HERSHEY_PLAIN, 3, [23,64,21], 3)
+                        cv2.putText(lane_image, "get to your lane" ,  (40,40), font, 3, [23,64,21], 3)
 
                     if flag == 0:
                         slope=str(slope)[:5]
-                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), cv2.FONT_HERSHEY_PLAIN, 3, [122,32,12], 2)
+                        cv2.putText(lane_image, str(slope),  (coords[0],coords[1]), font, 3, [122,32,12], 2)
                         cv2.line(lane_image, (coords[0],coords[1]), (coords[2],coords[3]), [0,255,255], 2)         # yellow color vertical
 
 

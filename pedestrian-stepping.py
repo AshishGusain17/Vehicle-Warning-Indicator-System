@@ -40,7 +40,7 @@ print(detection_model.inputs)
 print(detection_model.output_dtypes)
 print(detection_model.output_shapes)
 
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 flag = 0
 area = 0

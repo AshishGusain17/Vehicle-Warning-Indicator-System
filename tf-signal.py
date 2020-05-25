@@ -36,7 +36,7 @@ detection_model = detection_model.signatures['serving_default']
 
 # print(category_index)
 colors = np.random.uniform(0, 255, size=(len(category_index), 3))
-font = cv2.FONT_HERSHEY_PLAIN
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 print(detection_model.inputs)
 print(detection_model.output_dtypes)
@@ -73,8 +73,8 @@ print(detection_model.output_shapes)
 
   
 
-colors = np.random.uniform(0, 255, size=(len(category_index), 3))
-font = cv2.FONT_HERSHEY_PLAIN
+
+
 
 startRedLower = (0 , 130 , 50)
 startRedUpper = (13 , 255, 255)

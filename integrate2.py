@@ -111,7 +111,7 @@ def show_inference(dashPointer , lanePointer , frame):
     image_np = estimate_collide_utils.estimate_collide(indexesCars , boxesCars , image_np)
     image_np = estimate_stepping_utils.estimate_stepping(indexesPersons , boxesPersons , image_np)
 
-    cv2.putText(image_np,"DAY",(width - 200 ,50), font, 1.2, (167,133,0) , 2 , cv2.LINE_AA)
+    cv2.putText(image_np,"DAY",(width - 200 ,50), font, 2, (167,133,0) , 2 , cv2.LINE_AA)
 
     image_np = lane_detection_utils.draw_lines(lanePointer , lane_image , image_np)
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
