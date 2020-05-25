@@ -26,8 +26,8 @@ endRedUpper = (180 , 255 , 255)
 
 def signalDetection(indexesLights , boxesLights , image_np , signalCounter , flagSignal):
   maskRed = np.zeros_like(image_np)
-  fr = copy.deepcopy(image_np)
-  trafficLights = []
+  lighsImg = copy.deepcopy(image_np)
+  # trafficLights = []
   areas = []
   boxes = []
   for j in indexesLights:
@@ -35,20 +35,20 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
     x, y, w, h = boxesLights[i]
     label = (w * h)
     if label < 450:
-      label = "less"
+      label = " "
     else:
       cv2.rectangle(image_np, (x, y), (x + w, y + h), (255,255,0), 2)
       cv2.putText(image_np, str(label), (x, y - 5), font, 3, (255,255,0), 2)
-    trafficLights.append([x , y , w , h , str(label)])
+    # trafficLights.append([x , y , w , h , str(label)])
     crop = image_np[y:y+h , x:x+w , :]
     maskRed[y:y+h , x:x+w , :] = crop
-    color = colors[i]
-    cv2.rectangle(fr, (x, y), (x + w, y + h), (255,255,0), 2)
-    cv2.putText(fr, str(label), (x, y - 5), font, 3, (255,255,0), 2)
 
-  cv2.imshow("traffic light boxes in org frames" , fr)
-  cv2.imshow("mask onlt traffic lights",maskRed)
-  
+    cv2.rectangle(lighsImg, (x, y), (x + w, y + h), (255,255,0), 2)
+    cv2.putText(lighsImg, str(label), (x, y - 5), font, 1.2, (255,255,0), 2)
+
+  cv2.imshow("lights bounding boxes" , lighsImg)
+  cv2.imshow("box-thresholding lights",maskRed)
+
   blurred = cv2.GaussianBlur(maskRed, (11, 11), 0)
   hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
   mask1 = cv2.inRange(hsv, startRedLower, startRedUpper)
@@ -56,6 +56,7 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
   maskRed = mask1 + mask2
   maskRed = cv2.erode(maskRed, None, iterations=2)
   maskRed = cv2.dilate(maskRed, None, iterations=2)
+  cv2.imshow("red contours",maskRed)
 
   (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   hull = []
@@ -72,7 +73,7 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
       cY = int((extreme_top[1] + extreme_bottom[1]) / 2)
       distance = pairwise.euclidean_distances([(cX, cY)], Y=[extreme_left, extreme_right, extreme_top, extreme_bottom])[0]
       radius = int(distance[distance.argmax()])
-      if radius >= 4:
+      if radius >= 3:
           hull.append(chull)
           redcircles.append([radius , cX , cY]) 
           flag = 1
@@ -80,15 +81,17 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
     flagSignal.append(1)
   else:
     flagSignal.append(0)
+  
+  cv2.putText(image_np, str(flagSignal), (30,130), font, 1.2, (0,0,255), 2,cv2.LINE_AA)
+
   if sum(flagSignal) > 5:
-    cv2.putText(image_np, "Hey !! traffic signal is red", (30,30), font, 2, (0,255,255), 3,cv2.LINE_AA)
-    signalCounter = 8
+    cv2.putText(image_np, "Hey !! traffic signal is red", (30,30), font, 1.2, (0,0,255), 2,cv2.LINE_AA)
+    signalCounter = 1
   else:
     signalCounter = signalCounter - 1
-  if -20 < signalCounter <= 0:
-    cv2.putText(image_np, "You can move now", (30,30), font, 2, (0,255,255), 3,cv2.LINE_AA)
+  if -16 < signalCounter <= 0:
+    cv2.putText(image_np, "You can move now", (30,30), font, 1.2, (0,255,255), 2,cv2.LINE_AA)
 
-  # print(len(hull))
 
   # draw contours and hull points
   for i in range(len(hull)):

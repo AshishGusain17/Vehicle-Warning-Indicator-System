@@ -58,4 +58,4 @@ def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 # a.mp4(25)   56    74  110
 # b.mp4(24)  5  270   292  368    509
 # c.mp4(24)   0  111    166  189(many cars, but not in range)   290    494
-
+# d.mp4  2

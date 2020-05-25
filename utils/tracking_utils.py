@@ -87,7 +87,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
         x1,y1,x2,y2,label = i[0][0] , i[0][1] , i[0][2] , i[0][3] , i[0][4] 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(i[1]) 
-        cv2.putText(image_np, text, (x1, y1 + 30), font, 3, color, 2)
+        cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
 
     for i in curr:
         number=number+1
@@ -97,7 +97,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(number)
-        cv2.putText(image_np, text, (x1, y1 + 30), font, 3, color, 2)
+        cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
 
 
     if number==0:
@@ -109,7 +109,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
 
             cv2.rectangle(image_np, (xx1, yy1), (xx2, yy2), color, 2)
             text=' '+str(number)
-            cv2.putText(image_np, text, (xx1, yy1 + 30), font, 3, color, 2)
+            cv2.putText(image_np, text, (xx1, yy1 + 30), font, 1.2, color, 2)
 
 
     # print(number , len(prev_frame),len(curr_frame))

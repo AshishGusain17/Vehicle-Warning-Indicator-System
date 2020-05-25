@@ -81,7 +81,7 @@ def confirm_day_or_night(frame , flag_night_counter):
       pixel_len = pixel_len + len(i)
     ratio = pixel_ct / pixel_len
     print("ratio = ",ratio)
-    if ratio < 0.6:
+    if ratio < 0.5:
         flag_night_counter = flag_night_counter + 1
         return flag_night_counter
     else:
@@ -101,7 +101,7 @@ crash_count_frames = 0
 
 # signalCounter and flagSignal are traffic signal variables
 signalCounter = -99999
-flagSignal = [0] * 10
+flagSignal = [0] * 20
 
 # number and prev_frame are tracking variables
 number = 0
@@ -288,7 +288,7 @@ for z in range(10):
 print("flag_night_counter = ",flag_night_counter)
 cap.set(1 , start_frame)
 
-if flag_night_counter > 4:
+if flag_night_counter > 0:
     night()
 else:
     day()
