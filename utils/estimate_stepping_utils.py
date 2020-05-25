@@ -57,7 +57,7 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 		if areaPerson > 15000:
 		  cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " + str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
 		else:
-		  cv2.putText(image_np,"Drive slowly, person is ahead " + str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
+		  cv2.putText(image_np,"Drive slowly, person is ahead " +    str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
 
 	return image_np
 
@@ -70,3 +70,8 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 
 
 # a.mp4   100*25      803*25(inside cars)  819*25     842*25      913*25
+# k.mp4(30)   22(don't use, night)   83(don't night)
+# m.mp4(24)         6    25
+# o.mp4(30)    2
+# p.mp4(30)      3
+# q.mp4(30)    20   0

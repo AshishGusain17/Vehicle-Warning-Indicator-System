@@ -167,7 +167,7 @@ while True:
     # out1.write(frame)
     fps.update()
 
-    key=cv2.waitKey(100)
+    key=cv2.waitKey(1)
     if key & 0xFF == ord("q"):
         break
         
@@ -186,4 +186,9 @@ cv2.destroyAllWindows()
 
 
 
-# a.mp4   104*25   843*25      913*25
+# a.mp4(25)   104*25   843*25      913*25
+# k.mp4(30)   25   83
+# m.mp4(24)         6    25
+# o.mp4(30)    2
+# p.mp4(30)      3
+# q.mp4(30)    20   0

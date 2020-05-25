@@ -128,10 +128,15 @@ def selectRegions(image  , text , flag):
     while True:
         key = cv2.waitKey(1) & 0xFF
         # display the image and wait for a keypress
-        cv2.putText(image, text ,  (240,30), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
-        cv2.putText(image, "Press 'r' key to reset everything.",  (290,70), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
-        cv2.putText(image, "Press 'd' key if the region selection is done.",  (180,110), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
-
+        if flag==1:
+            cv2.putText(image, text ,  (240,30), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
+            cv2.putText(image, "Press 'r' key to reset everything.",  (290,70), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
+            cv2.putText(image, "Press 'd' key if the region selection is done.",  (180,110), font , 1.2, [0,255,255], 2,cv2.LINE_AA)
+        else:
+            cv2.putText(image, text ,  (240,30), font , 1.2, [0,255,0], 2,cv2.LINE_AA)
+            cv2.putText(image, "Press 'r' key to reset everything.",  (290,70), font , 1.2, [0,255,0], 2,cv2.LINE_AA)
+            cv2.putText(image, "Press 'd' key if the region selection is done.",  (180,110), font , 1.2, [0,255,0], 2,cv2.LINE_AA)
+               
         for pt in range(len(refPt)-1):
             pt1 , pt2 = refPt[pt] , refPt[pt+1]
             cv2.line(image, (pt1[0],pt1[1]), (pt2[0],pt2[1]), [0,255,255], 3)      

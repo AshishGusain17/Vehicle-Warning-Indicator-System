@@ -122,7 +122,7 @@ while True:
 
         fps.update()
     cv2.imshow("Frame", frame)
-    if cv2.waitKey(100) & 0xFF == ord("q"):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 
