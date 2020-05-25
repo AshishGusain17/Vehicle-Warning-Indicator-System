@@ -31,12 +31,11 @@ def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 			details = [ymin, xmin, ymin+h, xmin+w]
 
 
-	cv2.putText(image_np,str(max_curr_obj_area) ,(50,250), font, 1.2,(255,255,0),2,cv2.LINE_AA)
+	# cv2.putText(image_np,str(max_curr_obj_area) ,(50,250), font, 1.2,(255,255,0),2,cv2.LINE_AA)
 
 	centerX , centerY = (details[1] + details[3])/(2*width) , (details[0] + details[2])/(2*height)
 	if max_curr_obj_area>40000:
 		# if (centerX < 0.2 and details[2] > 0.9) or (0.3 <= centerX <= 0.7) or (centerX > 0.8 and details[2] > 0.9):
-		# print(centerX , 12)
 		if 0.27 <= centerX <= 0.73:
 			vehicle_crash = 1
 			crash_count_frames = 10
@@ -47,11 +46,15 @@ def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 
 	elif crash_count_frames > 0:
 		if max_curr_obj_area <= 70000:
-			cv2.putText(image_np,"YOU ARE GETTING CLOSER" ,(50,50), font, 1.2,(0,255,255),2,cv2.LINE_AA)
+			cv2.putText(image_np,"YOU ARE GETTING CLOSER" ,(340,40), font, 1.2,(0,255,255),2,cv2.LINE_AA)
 		elif max_curr_obj_area > 70000:
-			cv2.putText(image_np,"DON'T COLLIDE !!!" ,(50,50), font, 1.2,(0,0,255),2,cv2.LINE_AA)
+			cv2.putText(image_np,"DON'T COLLIDE !!!" ,(420,40), font, 1.2,(0,0,255),2,cv2.LINE_AA)
 
-	return image_np , crash_count_frames
+	return image_np , crash_count_frames 
+
+
+
+
 
 
 

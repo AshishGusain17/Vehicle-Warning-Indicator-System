@@ -38,7 +38,7 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
       label = " "
     else:
       cv2.rectangle(image_np, (x, y), (x + w, y + h), (255,255,0), 2)
-      cv2.putText(image_np, str(label), (x, y - 5), font, 3, (255,255,0), 2)
+      # cv2.putText(image_np, str(label), (x, y - 5), font, 3, (255,255,0), 2)
     # trafficLights.append([x , y , w , h , str(label)])
     crop = image_np[y:y+h , x:x+w , :]
     maskRed[y:y+h , x:x+w , :] = crop
@@ -82,15 +82,15 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
   else:
     flagSignal.append(0)
   
-  cv2.putText(image_np, str(flagSignal), (30,130), font, 1.2, (0,0,255), 2,cv2.LINE_AA)
+  # cv2.putText(image_np, str(flagSignal), (30,130), font, 1.2, (0,0,255), 2,cv2.LINE_AA)                 # array of 20 integers in flagSignal
 
   if sum(flagSignal) > 5:
-    cv2.putText(image_np, "Hey !! traffic signal is red", (30,30), font, 1.2, (0,0,255), 2,cv2.LINE_AA)
+    cv2.putText(image_np, "Hey!! traffic signal is red", (340,160), font, 1.2, (0,0,255), 2,cv2.LINE_AA)
     signalCounter = 1
   else:
     signalCounter = signalCounter - 1
   if -16 < signalCounter <= 0:
-    cv2.putText(image_np, "You can move now", (30,30), font, 1.2, (0,255,255), 2,cv2.LINE_AA)
+    cv2.putText(image_np, "You can drive now", (400,160), font, 1.2, (0,255,255), 2,cv2.LINE_AA)
 
 
   # draw contours and hull points
@@ -98,10 +98,14 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
       color_contours = (0, 255, 0) # green - color for contours
       color_hull = (0, 255, 255) # blue - color for convex hull
       # draw ith contour
-      cv2.putText(image_np, str(redcircles[i][0]), (redcircles[i][1] - 5, redcircles[i][2] - 5), font, 2, (255,255,255), 2)
+      cv2.putText(image_np, str(redcircles[i][0]), (redcircles[i][1] - 5, redcircles[i][2] - 5), font, 1.2, (255,255,255), 2)
       cv2.drawContours(image_np, contours, i, color_contours, 1, 8, hierarchy)
       cv2.drawContours(image_np, hull, i, color_hull, 2, 8)  
-  return image_np , signalCounter , flagSignal
+  return image_np , signalCounter , flagSignal 
+
+
+
+
 
 
 
@@ -121,4 +125,4 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
 # h.mp4   139   401
 # i.mp4   27   231(red-green)-d    252    378  537
 
-
+# n p s t

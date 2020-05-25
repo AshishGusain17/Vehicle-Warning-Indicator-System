@@ -51,12 +51,11 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np , flagPerson , ar
 			cv2.putText(image_np, str(areaPerson),  (xmin, ymin), font , 1.2, [0,0,0], 2)
 
 		if areaPerson > 15000:
-		  cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " ,(50,50), font, 1.2,(0,0,255),2,cv2.LINE_AA)
+			cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " ,(270,120), font, 1.2,(0,0,255),2,cv2.LINE_AA)
 		else:
-		  cv2.putText(image_np,"Drive slowly, person is ahead "    ,(50,50), font, 1.2,(0,255,255),2,cv2.LINE_AA)
+			cv2.putText(image_np,"Drive slowly, people are around "    ,(290,120), font, 1.2,(0,255,255),2,cv2.LINE_AA)
 
-	return image_np , flagPerson , areaPerson , areaDetails
-
+	return image_np , flagPerson , areaPerson , areaDetails 
 
 
 
