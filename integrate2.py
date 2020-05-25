@@ -271,8 +271,8 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/a.mp4')
-start_frame = 104*25+10
+cap=cv2.VideoCapture('../videos/p.mp4')
+start_frame = 3*30
 cap.set(1,start_frame)
 _ , image = cap.read()
 image=imutils.resize(image, width=1280)

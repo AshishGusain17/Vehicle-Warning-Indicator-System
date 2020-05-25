@@ -17,6 +17,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
+	height , width , channel = image_np.shape
 	vehicle_crash = 0
 	max_curr_obj_area = 0
 	centerX = centerY = 0
@@ -29,27 +30,32 @@ def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 			max_curr_obj_area = obj_area
 			details = [ymin, xmin, ymin+h, xmin+w]
 
-	# print(max_curr_obj_area)
-	centerX , centerY = (details[1] + details[3])/2 , (details[0] + details[2])/2
-	if max_curr_obj_area>70000:
-		if (centerX < 0.2 and details[2] > 0.9) or (0.2 <= centerX <= 0.8) or (centerX > 0.8 and details[2] > 0.9):
-		  vehicle_crash = 1
-		  crash_count_frames = 15
+
+	cv2.putText(image_np,str(max_curr_obj_area) ,(50,250), font, 1.2,(255,255,0),2,cv2.LINE_AA)
+
+	centerX , centerY = (details[1] + details[3])/(2*width) , (details[0] + details[2])/(2*height)
+	if max_curr_obj_area>40000:
+		# if (centerX < 0.2 and details[2] > 0.9) or (0.3 <= centerX <= 0.7) or (centerX > 0.8 and details[2] > 0.9):
+		# print(centerX , 12)
+		if 0.27 <= centerX <= 0.73:
+			vehicle_crash = 1
+			crash_count_frames = 10
+
 
 	if vehicle_crash == 0:
 		crash_count_frames = crash_count_frames - 1
 
-	# cv2.putText(image_np, "{}  {}  {}  ".format(str(centerX)[:6],str(details[2])[:6],max_curr_obj_area) ,(50,100), font, 1.2,(255,255,0),2,cv2.LINE_AA)
-
-	if crash_count_frames > 0:
-		if max_curr_obj_area <= 100000:
-		  cv2.putText(image_np,"YOU ARE GETTING CLOSER" ,(50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
-		elif max_curr_obj_area > 100000:
-		  cv2.putText(image_np,"DON'T COLLIDE !!!" ,(50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
+	elif crash_count_frames > 0:
+		if max_curr_obj_area <= 70000:
+			cv2.putText(image_np,"YOU ARE GETTING CLOSER" ,(50,50), font, 1.2,(0,255,255),2,cv2.LINE_AA)
+		elif max_curr_obj_area > 70000:
+			cv2.putText(image_np,"DON'T COLLIDE !!!" ,(50,50), font, 1.2,(0,0,255),2,cv2.LINE_AA)
 
 	return image_np , crash_count_frames
 
 
 
 # a.mp4(25)   56    74  110
-# b.mp4(24)  5  270   292  368
+# b.mp4(24)  5  270   292  368    509
+# c.mp4(24)   0  111    166  189(many cars, but not in range)   290    494
+
