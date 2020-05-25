@@ -35,11 +35,8 @@ def iou(boxA, boxB):
     return iou
 
 
-# number and prev_frame are tracking variables
-number = 0
-prev_frame = []
-def tracking(indexesCars , boxesCars , image_np):
-    global prev_frame , number
+
+def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
     change=[]
     curr_frame=[]
     for j in indexesCars:
@@ -142,7 +139,7 @@ def tracking(indexesCars , boxesCars , image_np):
             lll.append(ob)
     prev_frame=lll
     # print('after pop',prev_frame)
-    return  image_np
+    return  image_np , prev_frame , number
 
 
 

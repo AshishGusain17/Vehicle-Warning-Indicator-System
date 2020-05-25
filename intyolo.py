@@ -90,6 +90,14 @@ def confirm_day_or_night(frame , flag_night_counter):
 
 
 
+net = cv2.dnn.readNet("../yolov3.weights", "../yolov3.cfg")
+classes = []
+with open("../coco.names", "r") as f:
+    classes = [line.strip() for line in f.readlines()]
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+
+
 
 # flagPerson and areaPerson are pedestrian crash
 flagPerson = 0
@@ -106,20 +114,74 @@ flagSignal = [0] * 10
 # number and prev_frame are tracking variables
 number = 0
 prev_frame = []
-def show_inference(dashPointer , lanePointer , frame):
+
+def yolo_infer(dashPointer , lanePointer , frame):
     global flagPerson , areaPerson , areaDetails
     global crash_count_frames
     global signalCounter , flagSignal
     global prev_frame , number
-
+    
     image_np = np.array(frame)
     lane_image = copy.deepcopy(image_np)
-    height , width , channel = image_np.shape
+    height,width,channel = image_np.shape
 
+    mask = 255*np.ones_like(image_np)
+    vertices = np.array(dashPointer, np.int32)
+    cv2.fillPoly(mask, [vertices], [0,0,0])
+    image_np = cv2.bitwise_and(image_np, mask)
 
-    output_dict = functions.get_dict(dashPointer , detection_model , image_np)
+    # Detecting objects
+    blob = cv2.dnn.blobFromImage(image_np, 0.00392, (416,416), (0, 0, 0), True, crop=False)
+    net.setInput(blob)
+    outs = net.forward(output_layers)
 
-    confidencesCars , boxesCars , confidencesLights , boxesLights , confidencesPersons , boxesPersons = functions.findBoxes(image_np , output_dict)
+    confidencesCars , boxesCars = [] , []
+    confidencesLights , boxesLights = [] , []
+    confidencesPersons , boxesPersons = [] , []
+
+    for out in outs:
+        for detection in out:
+            scores = detection[5:]
+            class_id = np.argmax(scores)
+            if (class_id == 2 or class_id == 5  or class_id == 7):
+
+                scr = scores[class_id]
+                center_x = detection[0] * width
+                center_y = detection[1] * height
+
+                w = detection[2] * width
+                h = detection[3] * height
+                xmin = center_x - w / 2
+                ymin = center_y - h / 2
+                if (w*h >=800):
+                    confidencesCars.append(float(scr))
+                    boxesCars.append([int(xmin) , int(ymin) , int(w) , int(h)])
+            elif class_id == 0:
+                # print(scores)
+
+                scr = scores[class_id]
+                center_x = detection[0] * width
+                center_y = detection[1] * height
+
+                w = detection[2] * width
+                h = detection[3] * height
+                xmin = center_x - w / 2
+                ymin = center_y - h / 2
+                confidencesPersons.append(float(scr))
+                boxesPersons.append([int(xmin) , int(ymin) , int(w) , int(h)])
+
+            elif class_id == 9:
+                scr = scores[class_id]
+                center_x = detection[0] * width
+                center_y = detection[1] * height
+
+                w = detection[2] * width
+                h = detection[3] * height
+                xmin = center_x - w / 2
+                ymin = center_y - h / 2
+                confidencesLights.append(float(scr))
+                boxesLights.append([int(xmin) , int(ymin) , int(w) , int(h)])
+
 
     indexesLights = cv2.dnn.NMSBoxes(boxesLights, confidencesLights, 0.5, 0.4)
     indexesCars = cv2.dnn.NMSBoxes(boxesCars, confidencesCars, 0.5, 0.4)
@@ -136,6 +198,8 @@ def show_inference(dashPointer , lanePointer , frame):
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
 
     cv2.imshow("finally", image_np)
+
+
 
 
 
@@ -252,7 +316,7 @@ def day():
         # print(ctt ,fps._numFrames)
         # ctt = ctt + 1
 
-        show_inference(dashPointer , lanePointer , frame)
+        yolo_infer(dashPointer , lanePointer , frame)
 
         # cv2.imshow("original",frame)
         key = cv2.waitKey(1) & 0xFF

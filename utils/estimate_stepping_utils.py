@@ -17,22 +17,18 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 
-# flagPerson and areaPerson are pedestrian crash
-flagPerson = 0
-areaPerson = 0
-areaDetails = []
-def estimate_stepping(indexesPersons , boxesPersons , image_np):
-	global flagPerson , areaPerson , areaDetails
+
+def estimate_stepping(indexesPersons , boxesPersons , image_np , flagPerson , areaPerson , areaDetails):
 	pedes_present = 0
 	details = []
 	for j in indexesPersons:
 		i = j[0]
 		xmin, ymin, w, h = boxesPersons[i]
 		curr_area = w * h
-		if curr_area > 25000:
+		if curr_area > 9000:
 			areaPerson = curr_area
 			pedes_present = 1
-			flagPerson = 6
+			flagPerson = 5
 			details.append([xmin, ymin, w, h])
 
 	if pedes_present == 0:
@@ -43,7 +39,7 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 			xmin, ymin, w, h = box
 			boxArea = w * h
 			cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
-			cv2.putText(image_np, str(boxArea),  (xmin, ymin), font , 2, [0,0,0], 3)
+			cv2.putText(image_np, str(boxArea),  (xmin, ymin), font , 1.2, [0,0,0], 2)
 			if boxArea > areaPerson:
 				areaPerson = boxArea
 		areaDetails = details
@@ -52,14 +48,14 @@ def estimate_stepping(indexesPersons , boxesPersons , image_np):
 		for box in areaDetails:
 			xmin, ymin, w, h = box
 			cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
-			cv2.putText(image_np, str(areaPerson),  (xmin, ymin), font , 2, [0,0,0], 3)
+			cv2.putText(image_np, str(areaPerson),  (xmin, ymin), font , 1.2, [0,0,0], 2)
 
 		if areaPerson > 15000:
-		  cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " + str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
+		  cv2.putText(image_np,"STOP IT !!! DON'T HIT THE PERSON " ,(50,50), font, 1.2,(0,0,255),2,cv2.LINE_AA)
 		else:
-		  cv2.putText(image_np,"Drive slowly, person is ahead " +    str(areaPerson),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
+		  cv2.putText(image_np,"Drive slowly, person is ahead "    ,(50,50), font, 1.2,(0,255,255),2,cv2.LINE_AA)
 
-	return image_np
+	return image_np , flagPerson , areaPerson , areaDetails
 
 
 

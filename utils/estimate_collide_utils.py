@@ -16,10 +16,7 @@ colors = np.random.uniform(0, 255, size=(100, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
-# crash_count_frames are vehicle warning variables
-crash_count_frames = 0
-def estimate_collide(indexesCars , boxesCars , image_np):
-	global crash_count_frames
+def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 	vehicle_crash = 0
 	max_curr_obj_area = 0
 	centerX = centerY = 0
@@ -50,7 +47,7 @@ def estimate_collide(indexesCars , boxesCars , image_np):
 		elif max_curr_obj_area > 100000:
 		  cv2.putText(image_np,"DON'T COLLIDE !!!" ,(50,50), font, 1.2,(255,255,0),2,cv2.LINE_AA)
 
-	return image_np
+	return image_np , crash_count_frames
 
 
 

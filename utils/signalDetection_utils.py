@@ -23,11 +23,8 @@ endRedLower = (150 , 130 , 50)
 endRedUpper = (180 , 255 , 255)
 
 
-# signalCounter and flagSignal are traffic signal variables
-signalCounter = -99999
-flagSignal = [0] * 10
-def signalDetection(indexesLights , boxesLights , image_np):
-  global signalCounter , flagSignal
+
+def signalDetection(indexesLights , boxesLights , image_np , signalCounter , flagSignal):
   maskRed = np.zeros_like(image_np)
   fr = copy.deepcopy(image_np)
   trafficLights = []
@@ -101,7 +98,7 @@ def signalDetection(indexesLights , boxesLights , image_np):
       cv2.putText(image_np, str(redcircles[i][0]), (redcircles[i][1] - 5, redcircles[i][2] - 5), font, 2, (255,255,255), 2)
       cv2.drawContours(image_np, contours, i, color_contours, 1, 8, hierarchy)
       cv2.drawContours(image_np, hull, i, color_hull, 2, 8)  
-  return image_np
+  return image_np , signalCounter , flagSignal
 
 
 
