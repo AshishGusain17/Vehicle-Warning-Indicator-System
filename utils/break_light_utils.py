@@ -73,7 +73,7 @@ def break_light(dashPointer , image_np):
 		# draw ith convex hull object
 		cv2.drawContours(image_np, hull, i, color, 2, 8) 
 
-	cv2.putText(image_np,"NIGHT",(width - 200 ,50), font, 2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
+	cv2.putText(image_np,"NIGHT",(50 ,90), font, 2,(167,133,0),2,cv2.LINE_AA)                   # NIGHT TIME
 	cv2.imshow("finally" , image_np)
 
 
@@ -82,8 +82,9 @@ def break_light(dashPointer , image_np):
 # a.mp4(25fps)   25*25    292*25    
 # c.mp4(24fps) 133*24 + 6
 # d.mp4(24fps) 195*24   419*24
-# e.mp4(24fps) 47  283    338
+# e.mp4(24fps)   283    338
 # f.mp4(24fps) 36  223
 # j.mp4(30fps)    false results
-# k.mp4(30fps) blbwcv
 # l.mp4(30fps)   54
+# i.mp4(24)    267
+# g.mp4(24)    394

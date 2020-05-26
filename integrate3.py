@@ -106,6 +106,10 @@ flagSignal = [0] * 20
 # number and prev_frame are tracking variables
 number = 0
 prev_frame = []
+
+# flagLanes are lane variables
+flagLanes = [0] * 20
+
 def show_inference(dashPointer , lanePointer , frame):
     global flagPerson , areaPerson , areaDetails
     global crash_count_frames
@@ -132,7 +136,7 @@ def show_inference(dashPointer , lanePointer , frame):
 
     cv2.putText(image_np,"DAY",(50 ,90), font, 2, (167,133,0) , 2 , cv2.LINE_AA)
 
-    image_np = lane_detection_utils.draw_lines(lanePointer , lane_image , image_np)
+    image_np = lane_detection_utils.draw_lines(lanePointer , dashPointer , lane_image , image_np)
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
 
     cv2.imshow("finally", image_np)
@@ -167,7 +171,7 @@ def selectRegions(image  , text , flag):
         elif key == ord("d"):
             if flag == 1:
                 return 0
-            elif flag == 2 and len(refPt) > 2:
+            elif flag == 2:
                 return 0
         elif key == ord('q'):
             return 1
@@ -237,6 +241,8 @@ def day():
 
     Quit = selectRegions(copy.deepcopy(image)  , "Click points to select bird's eye view." , 2)
     lanePointer = refPt
+    if len(lanePointer) <= 2:
+        lanePointer = [[114, 690], [502, 384], [819, 391], [1201, 695]]
     print("For lanes: ",lanePointer)
     if Quit == 1:
         return
