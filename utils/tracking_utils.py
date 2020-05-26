@@ -67,11 +67,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
                     pop1 , pop2 = curr_ind , prev_ind
                     new_list = [ curr_obj[0], curr_obj[1], curr_obj[2], curr_obj[3] , ind ]
                     disp=curr_obj
-        # print(small,aa,bb,cc,dd)
-        # print(curr,prev)
-        # print(small,ll1,ll2)
-        # print(len(curr_frame) , len(prev_frame) , len(curr) , len(prev))
-        # print(min([len(prev_frame),len(curr_frame)]))
+
         if small > 0.45:                   # decrease this if objects are small and their iou can change to a greater extent
             display.append([disp,ind,chct])
             curr.pop(pop1)
@@ -79,15 +75,13 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
             change.append(new_list)
         else:
             break
-        # print(len(change),len(display))
-
-    # print('display curr',display,curr)       
+    
     for i in display:
         color=colors[i[1]%75]
         x1,y1,x2,y2,label = i[0][0] , i[0][1] , i[0][2] , i[0][3] , i[0][4] 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(i[1]) 
-        cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
+        # cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
 
     for i in curr:
         number=number+1
@@ -97,7 +91,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
         text=' '+str(number)
-        cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
+        # cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
 
 
     if number==0:
@@ -106,13 +100,12 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
             color=colors[number%75]
             xx1, yy1, xx2, yy2, label = i
             prev_frame.append([xx1, yy1, xx2, yy2, number, 0])
-
             cv2.rectangle(image_np, (xx1, yy1), (xx2, yy2), color, 2)
             text=' '+str(number)
-            cv2.putText(image_np, text, (xx1, yy1 + 30), font, 1.2, color, 2)
+            # cv2.putText(image_np, text, (xx1, yy1 + 30), font, 1.2, color, 2)
 
 
-    # print(number , len(prev_frame),len(curr_frame))
+
     for ch in change:
         find=ch[4]
         for rr,ob in enumerate(prev_frame):
@@ -126,8 +119,8 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
         prev_frame[rr][5]+=1
         if prev_frame[rr][5]>=20:
             index_note.append(rr)
-    # print("prev_frame",prev_frame)
-    # print(index_note)
+
+
     lll=[]
     for rr,ob in enumerate(prev_frame):
         flag=0
@@ -138,7 +131,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
         if flag==0:
             lll.append(ob)
     prev_frame=lll
-    # print('after pop',prev_frame)
+
     return  image_np , prev_frame , number
 
 

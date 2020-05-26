@@ -6,31 +6,37 @@ import numpy as np
 import copy
 from imutils.video import FPS
 
-net = cv2.dnn.readNet("../yolov3.weights", "../yolov3.cfg")
+net = cv2.dnn.readNet("../../yolov3.weights", "../../yolov3.cfg")
 classes = []
-with open("../coco.names", "r") as f:
+with open("../../coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-
 def iou(boxA, boxB):
+    # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
     yB = min(boxA[3], boxB[3])
+    # compute the area of intersection rectangle
     interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
-
+    # compute the area of both the prediction and ground-truth
+    # rectangles
     boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
     boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
-
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    # print(interArea, float(boxAArea + boxBArea - interArea))
     iou = interArea / float(boxAArea + boxBArea - interArea)
+    # return the intersection over union value
     return iou
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/a.mp4')
-cap.set(1,192*25)
+cap=cv2.VideoCapture('../../videos/a.mp4')
+cap.set(1,0)
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
 fps = FPS().start()
@@ -40,10 +46,7 @@ number=0
 cot=0
 while True:
     _,img=cap.read()
-    # if cot<120:
-    # 	cot=cot+1
-    # 	print(cot)
-    # 	continue
+    cot=cot+1
     height, width, channels = img.shape
 
     # Detecting objects
@@ -60,7 +63,8 @@ while True:
         for detection in out:
             scores = detection[5:]
             class_id = np.argmax(scores)
-            if (classes[class_id]=='person' or classes[class_id]=='bicycle' or classes[class_id]=='car' or classes[class_id]=='motorbike'  or classes[class_id]=='bus'  or classes[class_id] =='truck' or classes[class_id]=='traffic light'):
+            # print(classes[class_id])
+            if (classes[class_id]=='person' or classes[class_id]=='bicycle' or classes[class_id]=='car' or classes[class_id]=='motorbike'  or classes[class_id]=='bus'  or classes[class_id] =='truck'):
 
 	            confidence = scores[class_id]
 	            if confidence > 0.5:
@@ -74,7 +78,7 @@ while True:
 	                # Rectangle coordinates
 	                x = int(center_x - w / 2)
 	                y = int(center_y - h / 2)
-	                if (w*h >=800):
+	                if (w*h >=1800):
 		                boxes.append([x, y, w, h])
 		                confidences.append(float(confidence))
 		                class_ids.append(class_id)
@@ -210,14 +214,3 @@ print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
 # out1.release()
 cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-
-# a.mp4- 1100   190*25

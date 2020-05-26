@@ -229,3 +229,26 @@ day()
 
 cv2.destroyAllWindows()
 cap.release()
+
+
+
+
+
+
+
+
+
+
+
+
+# lanes   r
+# a   451(lanes showing good)
+# b   115(warning shows good )
+# d   0
+# d   81
+
+
+
+
+
+

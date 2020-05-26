@@ -115,11 +115,15 @@ flagSignal = [0] * 10
 number = 0
 prev_frame = []
 
+# flagLanes are lane variables
+flagLanes = [0] * 20
+
 def yolo_infer(dashPointer , lanePointer , frame):
     global flagPerson , areaPerson , areaDetails
     global crash_count_frames
     global signalCounter , flagSignal
     global prev_frame , number
+    global flagLanes
 
     image_np = np.array(frame)
     lane_image = copy.deepcopy(image_np)
@@ -194,7 +198,7 @@ def yolo_infer(dashPointer , lanePointer , frame):
 
     cv2.putText(image_np,"DAY",(width - 200 ,50), font, 2, (167,133,0) , 2 , cv2.LINE_AA)
 
-    image_np = lane_detection_utils.draw_lines(lanePointer , lane_image , image_np)
+    image_np , flagLanes = lane_detection_utils.draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes)
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
 
     cv2.imshow("finally", image_np)
@@ -335,8 +339,8 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/p.mp4')
-start_frame = 3*30
+cap=cv2.VideoCapture('../videos/highway.mp4')
+start_frame = 0*30
 cap.set(1,start_frame)
 _ , image = cap.read()
 image=imutils.resize(image, width=1280)

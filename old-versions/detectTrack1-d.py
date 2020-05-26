@@ -153,7 +153,7 @@ while True:
 
     out1.write(img)
     cv2.imshow("version", img)
-    key=cv2.waitKey(100)
+    key=cv2.waitKey(1)
     if key & 0xFF == ord("q"):
         break
 

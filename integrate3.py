@@ -115,6 +115,7 @@ def show_inference(dashPointer , lanePointer , frame):
     global crash_count_frames
     global signalCounter , flagSignal
     global prev_frame , number
+    global flagLanes
 
     image_np = np.array(frame)
     lane_image = copy.deepcopy(image_np)
@@ -136,10 +137,10 @@ def show_inference(dashPointer , lanePointer , frame):
 
     cv2.putText(image_np,"DAY",(50 ,90), font, 2, (167,133,0) , 2 , cv2.LINE_AA)
 
-    image_np = lane_detection_utils.draw_lines(lanePointer , dashPointer , lane_image , image_np)
+    image_np , flagLanes = lane_detection_utils.draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes)
     # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
 
-    cv2.imshow("finally", image_np)
+    cv2.imshow("Final result", image_np)
 
 
 
@@ -277,8 +278,8 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/c.mp4')
-start_frame = 113*24
+cap=cv2.VideoCapture('../videos/r.mp4')
+start_frame = 0*24
 cap.set(1,start_frame)
 _ , image = cap.read()
 image=imutils.resize(image, width=1280)

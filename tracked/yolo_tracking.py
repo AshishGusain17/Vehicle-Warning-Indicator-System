@@ -34,11 +34,13 @@ def iou(boxA, boxB):
     # return the intersection over union value
     return iou
 
+
+
 # cap=cv2.VideoCapture(0)
 cap=cv2.VideoCapture('../../videos/a.mp4')
 cap.set(1,0)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
 fps = FPS().start()
 
 prev_frame=[]
@@ -47,12 +49,6 @@ cot=0
 while True:
     _,img=cap.read()
     cot=cot+1
-    if cot==8:
-        cap.set(1,120)
-    if cot==10:
-        cap.set(1,160)
-    if cot==12:
-        cap.set(1,180)
     height, width, channels = img.shape
 
     # Detecting objects
@@ -208,8 +204,8 @@ while True:
     print('after pop',prev_frame)
 
     cv2.imshow("version", img)
-    out1.write(img)
-    key=cv2.waitKey(100)
+    # out1.write(img)
+    key=cv2.waitKey(1)
     fps.update()
     if key & 0xFF == ord("q"):
         break
@@ -218,5 +214,5 @@ fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()
-out1.release()
+# out1.release()
 cv2.destroyAllWindows()
