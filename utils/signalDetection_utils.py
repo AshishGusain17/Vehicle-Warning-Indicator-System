@@ -98,7 +98,7 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
       color_contours = (0, 255, 0) # green - color for contours
       color_hull = (0, 255, 255) # blue - color for convex hull
       # draw ith contour
-      cv2.putText(image_np, str(redcircles[i][0]), (redcircles[i][1] - 5, redcircles[i][2] - 5), font, 1.2, (255,255,255), 2)
+      # cv2.putText(image_np, str(redcircles[i][0]), (redcircles[i][1] - 5, redcircles[i][2] - 5), font, 1.2, (255,255,255), 2)
       cv2.drawContours(image_np, contours, i, color_contours, 1, 8, hierarchy)
       cv2.drawContours(image_np, hull, i, color_hull, 2, 8)  
   return image_np , signalCounter , flagSignal 
