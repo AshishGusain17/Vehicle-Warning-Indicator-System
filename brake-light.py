@@ -47,13 +47,13 @@ def confirm_day_or_night(frame , flag_night_counter):
         return flag_night_counter
 
 
-# cap=cv2.VideoCapture(0)
+
 cap=cv2.VideoCapture('../videos/l.mp4')
 set_pos=54*30
 
 cap.set(1,set_pos)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out1 = cv2.VideoWriter('MI_V-s_CSK.avi', fourcc, 10.0, (int(cap.get(3)),int(cap.get(4))))
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('brakes.avi', fourcc, 25, (1280,720))
 fps = FPS().start()
 
 ct=0
@@ -122,11 +122,13 @@ while True:
 
         fps.update()
     cv2.imshow("Frame", frame)
+    # out1.write(frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
 
 fps.stop()
+# out1.release()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 cap.release()

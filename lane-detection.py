@@ -47,7 +47,7 @@ def roi(img, vertices):
 def draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes):
 	height , width , channels= image_np.shape
 	gray_image = cv2.cvtColor(lane_image , cv2.COLOR_BGR2GRAY)
-	canny_image =  cv2.Canny(gray_image, threshold1 = 100, threshold2=100)
+	canny_image =  cv2.Canny(gray_image, threshold1 = 100 , threshold2 = 100)
 	cv2.imshow("entire canny",canny_image)
 	canny_image = cv2.GaussianBlur(canny_image,(3,3),0)
 
@@ -112,11 +112,14 @@ def draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes):
 	except:
 		pass
 	cv2.imshow("lane_image",lane_image)
+	# out1.write(lane_image)
 
 
 
-cap=cv2.VideoCapture('../videos/d.mp4')
-start_frame = 81*24
+cap=cv2.VideoCapture('../videos/r.mp4')
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('lanes.avi', fourcc, 25, (1280,720))
+start_frame = 0*24
 flagLanes = [0] * 20
 
 
@@ -229,7 +232,7 @@ day()
 
 cv2.destroyAllWindows()
 cap.release()
-
+# out1.release()
 
 
 

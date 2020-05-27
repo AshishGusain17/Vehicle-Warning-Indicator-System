@@ -28,7 +28,7 @@ category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABE
 
 
 
-model_name = 'ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03'
+model_name = 'ssd_inception_v2_coco_2018_01_28'
 model_dir =  "../bigdata/models/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
@@ -40,35 +40,54 @@ print(detection_model.inputs)
 print(detection_model.output_dtypes)
 print(detection_model.output_shapes)
 
+
+
+
+
+
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 flag = 0
 area = 0
+areaDetails = []
 def estimate_stepping(output_dict,height,width,image_np):
-  pedes_present = 0
-  global flag,area
+    pedes_present = 0
+    global flag,area,areaDetails
+    details = []
+    for ind,scr in enumerate(output_dict['detection_classes']):
+        if scr==1:
+            ymin, xmin, ymax, xmax = output_dict['detection_boxes'][ind]
+            score = output_dict['detection_scores'][ind]
+            if score>0.4:
+                area = int((xmax - xmin)*width * (ymax - ymin)*height)
+                print(output_dict['detection_boxes'][ind],output_dict['detection_scores'][ind],area)
+                if area>9000:
+                    pedes_present = 1
+                    flag=5
+                    details.append([int(xmin*width), int(ymin*height), int((xmax - xmin)*width), int((ymax-ymin)*height)])
 
-  for ind,scr in enumerate(output_dict['detection_classes']):
-    if scr==1:
-      ymin, xmin, ymax, xmax = output_dict['detection_boxes'][ind]
-      score = output_dict['detection_scores'][ind]
-      if score>0.4:
-        # cv2.putText(image_np,'min xy',(int(xmin*width),int(ymin*height)), font, 1,(255,0,0),2,cv2.LINE_AA)
-        # cv2.putText(image_np,'max xy',(int(xmax*width),int(ymax*height)), font, 1,(255,0,0),2,cv2.LINE_AA)
-        area = int((xmax - xmin)*width * (ymax - ymin)*height)
-        print(output_dict['detection_boxes'][ind],output_dict['detection_scores'][ind],area)
-        if area>2500:
-          pedes_present = 1
-          flag=12
-  if pedes_present == 0:
-    flag=flag-1
-
-
-  if flag > 0:
-    if area > 15000:
-      cv2.putText(image_np,"STOP IT !!! DON'T HIT HIM " + str(area),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
+    if pedes_present == 0:
+        flag=flag-1
     else:
-      cv2.putText(image_np,"BE CAREFUL !!! Someone is in front " + str(area),(50,50), font, 3,(255,255,0),2,cv2.LINE_AA)
+        area = 0
+        for box in details:
+            xmin, ymin, w, h = box
+            boxArea = w * h
+            cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
+            if boxArea > area:
+                area = boxArea
+        areaDetails = details
+
+    if flag > 0:
+        for box in areaDetails:
+            xmin, ymin, w, h = box
+            cv2.rectangle(image_np, (xmin, ymin), (xmin + w, ymin + h), (0,0,0), 3)
+            # cv2.putText(image_np, str(areaPerson),  (xmin, ymin), font , 1.2, [0,0,0], 2)
+
+        if area > 15000:
+            cv2.putText(image_np,"STOP IT !!! DON'T HIT HIM " + str(area),(50,50), font, 1.2,(0,0,255),2,cv2.LINE_AA)
+        else:
+            cv2.putText(image_np,"BE CAREFUL !!! Someone is in front " + str(area),(50,50), font, 1.2,(0,255,255),2,cv2.LINE_AA)
 
 
 
@@ -99,15 +118,7 @@ def run_inference_for_single_image(model, image):
   # print(5,output_dict)
 
 
-  # Handle models with masks:
-  # if 'detection_masks' in output_dict:
-  #   # Reframe the the bbox mask to the image size.
-  #   detection_masks_reframed = utils_ops.reframe_box_masks_to_image_masks(
-  #             output_dict['detection_masks'], output_dict['detection_boxes'],
-  #              image.shape[0], image.shape[1])   
-  #   detection_masks_reframed = tf.cast(detection_masks_reframed > 0.5,
-  #                                      tf.uint8)
-  #   output_dict['detection_masks_reframed'] = detection_masks_reframed.numpy()
+
   return output_dict
 
 
@@ -147,14 +158,15 @@ def show_inference(model, image_path):
 # cap=cv2.VideoCapture(0)
 cap=cv2.VideoCapture('../videos/a.mp4')
 time.sleep(2.0)
-cap.set(1,913*25)
+cap.set(1,25*843)
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
-# out1 = cv2.VideoWriter('i.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+# out1 = cv2.VideoWriter('pedestrian.avi', fourcc, 30, (1280,720))
 fps = FPS().start()
 ctt = 0
 while True:
     (grabbed, frame) = cap.read()
+    frame=imutils.resize(frame, width=1280)
     print('frame',frame.shape)
 
     # print(ctt)
@@ -187,8 +199,16 @@ cv2.destroyAllWindows()
 
 
 # a.mp4(25)   104*25   843*25      913*25
-# k.mp4(30)   25   83
 # m.mp4(24)         6    25
 # o.mp4(30)    2
 # p.mp4(30)      3
 # q.mp4(30)    20   0
+
+
+
+
+
+
+
+
+

@@ -15,8 +15,8 @@ colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 # cap=cv2.VideoCapture(0)
 cap=cv2.VideoCapture('../videos/highway.mp4')
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out1 = cv2.VideoWriter('version.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# out1 = cv2.VideoWriter('version.avi', fourcc, 3.0, (int(cap.get(3)),int(cap.get(4))))
 
 prev_frame=[]
 number=0
@@ -151,12 +151,12 @@ while True:
     for j in index_note:
         prev_frame.pop(j)
 
-    out1.write(img)
+    # out1.write(img)
     cv2.imshow("version", img)
     key=cv2.waitKey(1)
     if key & 0xFF == ord("q"):
         break
 
-out1.release()
+# out1.release()
 cap.release()
 cv2.destroyAllWindows()
