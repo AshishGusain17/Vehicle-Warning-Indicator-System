@@ -102,15 +102,29 @@ the location of the utils folder using sys module.
 * Tensorflow version 2.0 is must or else you may come across various error.
 
 ### Working:
+```
+Run python integrate3.py or python intyolo.py after following the above mentioned requisities.
+Now select the dash area for the car by clicking on multiple points as shown below. This is done to 
+remove detection of our own vehicle in some cases which may generate false results.
+```
+<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop1.png?raw=true" width="410">|
 
+```
+In the second step, select the area where searching of the lanes should be made. This may differ due to 
+the placement of dash-cams in the vehicle. The area above the horizon where road ends should not be selected.
+```
+<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop2.png?raw=true" width="410">|
+
+```
+Now, you can visualize thw working and see the warnings/suggestions displayed to the driver.
 All the works that are implemented individually are present in their respective folders, which are integrated together.
-Run the latest version of integrate.py(integrate3.py) and visualize it's working.
 Old models may have some bugs now, as many files inside utils are changed.
-Visit honors branch of models repository forked from tf/models to see more work on this project, that I have done in google colab.
+Visit honors branch of models repository forked from tf/models to see more work on this project, 
+that I have done in google colab.
+```
 
 ### Drawbacks:
 * At night, searching for tail light should be made in the dark. If sufficient light is present, false cases can get introduced.
 * Tracking works good for bigger objects, while smaller may loose their track ID at places.
 * Threshold values used in lane detection needs to be altered depending on the roads and the quality of the videos.
 * Object detection needs to work properly for better results throughout. The model with higher accuracy should be downloaded from the link given above.
-

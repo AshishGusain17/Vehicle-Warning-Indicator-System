@@ -24,30 +24,15 @@ from utils import label_map_util
 
 
 
-utils_ops.tf = tf.compat.v1
-tf.gfile = tf.io.gfile
-PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
-category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
-
-
-
-
-model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
-model_dir =  "../bigdata/models/" + model_name + "/saved_model"
-detection_model = tf.saved_model.load(str(model_dir))
-detection_model = detection_model.signatures['serving_default']
 
 
 
 # print(category_index)
-colors = np.random.uniform(0, 255, size=(len(category_index), 3))
+colors = np.random.uniform(0, 255, size=(100, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 blackLower = (0 , 0 , 0)
 blackUpper = (180 , 255 , 35)
 
-print(detection_model.inputs)
-print(detection_model.output_dtypes)
-print(detection_model.output_shapes)
 
 
 
@@ -199,7 +184,6 @@ def yolo_infer(dashPointer , lanePointer , frame):
     cv2.putText(image_np,"DAY",(width - 200 ,50), font, 2, (167,133,0) , 2 , cv2.LINE_AA)
 
     image_np , flagLanes = lane_detection_utils.draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes)
-    # lane_detection_utils.all_lines(lanePointer , lane_image , image_np)
 
     cv2.imshow("finally", image_np)
 
@@ -339,7 +323,7 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/highway.mp4')
+cap=cv2.VideoCapture('../videos/r.mp4')
 start_frame = 0*30
 cap.set(1,start_frame)
 _ , image = cap.read()
