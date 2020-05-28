@@ -107,16 +107,16 @@ Run python integrate3.py or python intyolo.py after following the above mentione
 Now select the dash area for the car by clicking on multiple points as shown below. This is done to 
 remove detection of our own vehicle in some cases which may generate false results.
 ```
-<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop1.png?raw=true" width="410">|
+<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop1.png?raw=true" width="410">
 
 ```
 In the second step, select the area where searching of the lanes should be made. This may differ due to 
 the placement of dash-cams in the vehicle. The area above the horizon where road ends should not be selected.
 ```
-<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop2.png?raw=true" width="410">|
+<img src="https://github.com/AshishGusain17/Vehicle-Warning-Indicator-System/blob/master/display/crop2.png?raw=true" width="410">
 
 ```
-Now, you can visualize thw working and see the warnings/suggestions displayed to the driver.
+Now, you can visualize the working and see the warnings/suggestions displayed to the driver.
 All the works that are implemented individually are present in their respective folders, which are integrated together.
 Old models may have some bugs now, as many files inside utils are changed.
 Visit honors branch of models repository forked from tf/models to see more work on this project, 
