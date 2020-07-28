@@ -94,7 +94,7 @@ Whenever, pedestrian comes in our view, a warning is displayed.
 
 ###  Requisities:
 
-Download the  tensorflow model from [here](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md).
+Download the  tensorflow model from [here](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf1_detection_zoo.md).
 * Provide the path to the labels txt file using variable named PATH_TO_LABELS.
 * Provide the path to the tensorflow model using variable named model_name.
 * Make sure all the files are imported properly from the utils folder. If you get an error, add 
