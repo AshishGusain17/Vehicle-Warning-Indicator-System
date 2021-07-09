@@ -67,34 +67,34 @@ def draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes):
             coords = line[0]
             x1 , y1 , x2 , y2 = coords[0] , coords[1] , coords[2] , coords[3]
             if x2 == x1:
-                # cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 3)                          # yellow color vertical
+                cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 3)                          # yellow color vertical
                 just_to_pass = 0
             else:
                 slope=(y1 - y2)/(x2 - x1)
                 if -0.3 < slope < 0.3:
-                    # cv2.line(lane_image, (x1 , y1), (x2 , y2), [255,0,0], 2)                        # blue color horizontal
+                    cv2.line(lane_image, (x1 , y1), (x2 , y2), [255,0,0], 2)                        # blue color horizontal
                     just_to_pass = 0
                 elif slope < 0:
                     if width//2 > max(x1 , x2):
                         slope=str(slope)[:5]
-                        # cv2.putText(lane_image, str(slope),  (x1 , y1), font, 3, [122,32,12], 2)
-                        # cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,0,0], 2)                      # black color vertical
+                        cv2.putText(lane_image, str(slope),  (x1 , y1), font, 1, [122,32,12], 2)
+                        cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,0,0], 2)                      # black color vertical
                         flagCounter = 1
                     else:
                         slope=str(slope)[:5]
-                        # cv2.putText(lane_image, str(slope),  (x1 , y1), font, 3, [122,32,12], 2)
-                        # cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 2)                   # yellow color vertical
+                        cv2.putText(lane_image, str(slope),  (x1 , y1), font, 1, [122,32,12], 2)
+                        cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 2)                   # yellow color vertical
 
                 elif slope > 0:
                     if width//2 < min(x1 , x2):
                         slope=str(slope)[:5]
-                        # cv2.putText(lane_image, str(slope),  (x1 , y1), font, 3, [122,32,12], 2)
-                        # cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,0,0], 2)                       # black color vertical
+                        cv2.putText(lane_image, str(slope),  (x1 , y1), font, 1, [122,32,12], 2)
+                        cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,0,0], 2)                       # black color vertical
                         flagCounter = 1
                     else:
                         slope=str(slope)[:5]
-                        # cv2.putText(lane_image, str(slope),  (x1 , y1), font, 3, [122,32,12], 2)
-                        # cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 2)                   # yellow color vertical
+                        cv2.putText(lane_image, str(slope),  (x1 , y1), font, 1, [122,32,12], 2)
+                        cv2.line(lane_image, (x1 , y1), (x2 , y2), [0,255,255], 2)                   # yellow color vertical
         if flagCounter == 1:
             flagLanes.append(1)
         else:
@@ -105,7 +105,7 @@ def draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes):
 
     except:
         pass
-    # cv2.imshow("lane_image",lane_image)
+    cv2.imshow("lane_image",lane_image)
     return image_np , flagLanes
 
 

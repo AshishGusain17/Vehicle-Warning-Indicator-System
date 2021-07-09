@@ -47,6 +47,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
 
     # object tracking 
     curr , prev=copy.deepcopy(curr_frame) , copy.deepcopy(prev_frame)
+    tr_frame = copy.deepcopy(image_np)
     display=[]
     ll1,ll2,l1,l2=[],[],[],[]
     ans=0
@@ -80,8 +81,10 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
         color=colors[i[1]%75]
         x1,y1,x2,y2,label = i[0][0] , i[0][1] , i[0][2] , i[0][3] , i[0][4] 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
+
+        cv2.rectangle(tr_frame, (x1, y1), (x2, y2), color, 2)
         text=' '+str(i[1]) 
-        # cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
+        cv2.putText(tr_frame, text, (x1, y1 + 30), font, 1.2, color, 2)
 
     for i in curr:
         number=number+1
@@ -90,8 +93,10 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
         x1, y1, x2, y2, label = i[0] , i[1] , i[2] , i[3] , i[4] 
 
         cv2.rectangle(image_np, (x1, y1), (x2, y2), color, 2)
+
+        cv2.rectangle(tr_frame, (x1, y1), (x2, y2), color, 2)
         text=' '+str(number)
-        # cv2.putText(image_np, text, (x1, y1 + 30), font, 1.2, color, 2)
+        cv2.putText(tr_frame, text, (x1, y1 + 30), font, 1.2, color, 2)
 
 
     if number==0:
@@ -101,8 +106,10 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
             xx1, yy1, xx2, yy2, label = i
             prev_frame.append([xx1, yy1, xx2, yy2, number, 0])
             cv2.rectangle(image_np, (xx1, yy1), (xx2, yy2), color, 2)
+
+            cv2.rectangle(tr_frame, (xx1, yy1), (xx2, yy2), color, 2)
             text=' '+str(number)
-            # cv2.putText(image_np, text, (xx1, yy1 + 30), font, 1.2, color, 2)
+            cv2.putText(tr_frame, text, (xx1, yy1 + 30), font, 1.2, color, 2)
 
 
 
@@ -132,6 +139,7 @@ def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
             lll.append(ob)
     prev_frame=lll
 
+    cv2.imshow("tracking", tr_frame)
     return  image_np , prev_frame , number
 
 
