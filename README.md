@@ -77,10 +77,14 @@ Whenever, pedestrian comes in our view, a warning is displayed.
 
 <br />
 
-### Dependencies required:
-* Python 3.0
-* TensorFlow 2.0
-* openCV
+### Dependencies:
+```
+Check for requirements.txt file with all the dependencies and their specific versions
+```
+
+```
+For installation of the libraries: pip install -r requirements.txt
+```
 
 ### Project Structure:
 * **lanes**:This folder contains files related to lane detection only.
