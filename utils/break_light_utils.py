@@ -12,7 +12,7 @@ import copy
 import pathlib
 from collections import defaultdict
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -42,7 +42,7 @@ def break_light(dashPointer , image_np):
 	maskRed = cv2.dilate(maskRed, None, iterations=2)
 
 
-	(_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+	(contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	hull = []
 	indHull = []
 	for i in range(len(contours)):

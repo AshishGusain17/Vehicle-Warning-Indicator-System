@@ -116,7 +116,7 @@ def signalDetection(image_np , indexesLights , boxesLights):
   maskRed = cv2.erode(maskRed, None, iterations=2)
   maskRed = cv2.dilate(maskRed, None, iterations=2)
 
-  (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+  (contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   hull = []
   redcircles = []
   flagSignal.pop(0) 

@@ -14,7 +14,7 @@ from collections import defaultdict
 
 
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -39,8 +39,8 @@ def iou(boxA, boxB):
 def tracking(indexesCars , boxesCars , image_np , prev_frame , number):
     change=[]
     curr_frame=[]
-    for j in indexesCars:
-        i = j[0]
+    for i in indexesCars:
+        # i = j[0]
         x, y, w, h = boxesCars[i]
         label = "vehicle"
         curr_frame.append([x,y,x+w,y+h,label])

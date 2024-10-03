@@ -19,28 +19,28 @@ from utils import lane_detection_utils
 from utils import break_light_utils
 from utils import functions
 
-from utils import ops as utils_ops
-from utils import label_map_util
+# from utils import ops as utils_ops
+# from utils import label_map_util
 
 
 
-utils_ops.tf = tf.compat.v1
+# utils_ops.tf = tf.compat.v1
 tf.gfile = tf.io.gfile
-PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
-category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+# PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
+# category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
 
 
-model_name = 'ssd_inception_v2_coco_2018_01_28'
-model_dir =  "../bigdata/models/" + model_name + "/saved_model"
+model_name = 'ssd_inception_v2_coco_2018_01_28\ssd_inception_v2_coco_2018_01_28'
+model_dir =  "../../bigDatas/mlModels/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
 
 
 
 # print(category_index)
-colors = np.random.uniform(0, 255, size=(len(category_index), 3))
+# colors = np.random.uniform(0, 255, size=(len(category_index), 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 blackLower = (0 , 0 , 0)
 blackUpper = (180 , 255 , 35)
@@ -125,10 +125,19 @@ def show_inference(dashPointer , lanePointer , frame):
     output_dict = functions.get_dict(dashPointer , detection_model , image_np)
 
     confidencesCars , boxesCars , confidencesLights , boxesLights , confidencesPersons , boxesPersons = functions.findBoxes(image_np , output_dict)
+    print("confidencesCars: ", confidencesCars)
+    print("boxesCars: ", boxesCars)
+    print("confidencesLights: ", confidencesLights)
+    print("boxesLights: ", boxesLights)
+    print("confidencesPersons: ", confidencesPersons)
+    print("boxesPersons: ", boxesPersons)
 
     indexesLights = cv2.dnn.NMSBoxes(boxesLights, confidencesLights, 0.5, 0.4)
+    print("indexesLights: ", indexesLights)
     indexesCars = cv2.dnn.NMSBoxes(boxesCars, confidencesCars, 0.5, 0.4)
+    print("indexesCars: ", indexesCars)
     indexesPersons = cv2.dnn.NMSBoxes(boxesPersons, confidencesPersons, 0.5, 0.4)
+    print("indexesPersons: ", indexesPersons)
 
     image_np , signalCounter , flagSignal = signalDetection_utils.signalDetection(indexesLights , boxesLights , image_np , signalCounter , flagSignal)
     image_np , prev_frame , number = tracking_utils.tracking(indexesCars , boxesCars , image_np , prev_frame , number)
@@ -278,7 +287,7 @@ def day():
 refPt = []                  # to store refernece pointers
 flag_night_counter = 0      # counter to count night frames
 
-cap=cv2.VideoCapture('../videos/r.mp4')
+cap=cv2.VideoCapture('../../bigDatas/videos/f.mp4')
 start_frame = 0*24
 cap.set(1,start_frame)
 _ , image = cap.read()

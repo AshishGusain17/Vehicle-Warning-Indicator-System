@@ -11,23 +11,23 @@ from imutils.video import FPS
 
 # sys.path.append('../../research')
 
-from utils import ops as utils_ops
-from utils import label_map_util
+# from utils import ops as utils_ops
+# from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
-utils_ops.tf = tf.compat.v1
-tf.gfile = tf.io.gfile
-PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
-category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+# utils_ops.tf = tf.compat.v1
+# tf.gfile = tf.io.gfile
+# PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
+# category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
 
 
-model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
-model_dir =  "../bigdata/models/" + model_name + "/saved_model"
+model_name = 'ssd_inception_v2_coco_2018_01_28\ssd_inception_v2_coco_2018_01_28'
+model_dir =  "../../bigDatas/mlModels/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
 
@@ -118,15 +118,15 @@ def show_inference(model, image_path):
   output_dict = run_inference_for_single_image(model, image_np)
   estimate_collide(output_dict,height,width,image_np)
 
-  vis_util.visualize_boxes_and_labels_on_image_array(
-      image_np,
-      output_dict['detection_boxes'],
-      output_dict['detection_classes'],
-      output_dict['detection_scores'],
-      category_index,
-      instance_masks=output_dict.get('detection_masks_reframed', None),
-      use_normalized_coordinates=True,
-      line_thickness=8)
+  # vis_util.visualize_boxes_and_labels_on_image_array(
+  #     image_np,
+  #     output_dict['detection_boxes'],
+  #     output_dict['detection_classes'],
+  #     output_dict['detection_scores'],
+  #     category_index,
+  #     instance_masks=output_dict.get('detection_masks_reframed', None),
+  #     use_normalized_coordinates=True,
+  #     line_thickness=8)
 
   return image_np
 
@@ -137,7 +137,7 @@ def show_inference(model, image_path):
 
 
 
-cap=cv2.VideoCapture('../videos/b.mp4')
+cap=cv2.VideoCapture('../../bigDatas/videos/i.mp4')
 time.sleep(2.0)
 
 cap.set(1,379*24)

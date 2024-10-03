@@ -28,7 +28,7 @@ from utils import label_map_util
 
 
 # print(category_index)
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 blackLower = (0 , 0 , 0)
 blackUpper = (180 , 255 , 35)

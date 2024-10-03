@@ -1,17 +1,9 @@
 import numpy as np
 import cv2
 import imutils
-import time
 from imutils.video import FPS
 from sklearn.metrics import pairwise
 import numpy as np
-import os
-import six.moves.urllib as urllib
-import sys
-import tensorflow as tf
-import pathlib
-from collections import defaultdict
-import copy
 
 
 
@@ -48,7 +40,7 @@ def confirm_day_or_night(frame , flag_night_counter):
 
 
 
-cap=cv2.VideoCapture('../videos/l.mp4')
+cap=cv2.VideoCapture('../../bigDatas/videos/f.mp4')
 set_pos=54*30
 
 cap.set(1,set_pos)
@@ -84,7 +76,7 @@ while True:
             maskRed = cv2.dilate(maskRed, None, iterations=2)
             # cv2.imshow('Red',imutils.resize(maskRed,width=250))
 
-            (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+            (contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
             hull = []
             indHull = []

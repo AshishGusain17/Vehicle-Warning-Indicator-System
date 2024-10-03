@@ -12,7 +12,7 @@ import pathlib
 from collections import defaultdict
 
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 

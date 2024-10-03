@@ -12,7 +12,7 @@ import copy
 import pathlib
 from collections import defaultdict
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -22,8 +22,8 @@ def estimate_collide(indexesCars , boxesCars , image_np , crash_count_frames):
 	max_curr_obj_area = 0
 	centerX = centerY = 0
 	details = [0 , 0 , 0 , 0]
-	for j in indexesCars:
-		i = j[0]
+	for i in indexesCars:
+		# i = j[0]
 		xmin, ymin, w, h = boxesCars[i]
 		obj_area = w * h
 		if obj_area > max_curr_obj_area:

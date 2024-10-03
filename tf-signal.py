@@ -14,28 +14,29 @@ from imutils.video import FPS
 import copy
 
 
-from utils import ops as utils_ops
-from utils import label_map_util
+# from utils import ops as utils_ops
+# from utils import label_map_util
 
 
 
-utils_ops.tf = tf.compat.v1
+# utils_ops.tf = tf.compat.v1
 tf.gfile = tf.io.gfile
-PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
-category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+# PATH_TO_LABELS = '../bigdata/data/mscoco_label_map.pbtxt'
+# category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
 
 
-model_name = 'ssdlite_mobilenet_v2_coco_2018_05_09'
-model_dir =  "../bigdata/models/" + model_name + "/saved_model"
+model_name = 'ssd_inception_v2_coco_2018_01_28\ssd_inception_v2_coco_2018_01_28'
+model_dir =  "../../bigDatas/mlModels/" + model_name + "/saved_model"
 detection_model = tf.saved_model.load(str(model_dir))
 detection_model = detection_model.signatures['serving_default']
 
 
 
+
 # print(category_index)
-colors = np.random.uniform(0, 255, size=(len(category_index), 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 print(detection_model.inputs)
@@ -89,8 +90,8 @@ def signalDetection(image_np , indexesLights , boxesLights):
   trafficLights = []
   areas = []
   boxes = []
-  for j in indexesLights:
-    i = j[0]
+  for i in indexesLights:
+    # i = j[0]
     x, y, w, h = boxesLights[i]
     label = (w * h)
     if label < 450:
@@ -116,7 +117,7 @@ def signalDetection(image_np , indexesLights , boxesLights):
   maskRed = cv2.erode(maskRed, None, iterations=2)
   maskRed = cv2.dilate(maskRed, None, iterations=2)
 
-  (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+  (contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   hull = []
   redcircles = []
   flagSignal.pop(0) 
@@ -209,7 +210,7 @@ def show_inference(model, image_path,ctt):
 
 
 # cap=cv2.VideoCapture(0)
-cap=cv2.VideoCapture('../videos/i.mp4')
+cap=cv2.VideoCapture('../../bigDatas/videos/f.mp4')
 cap.set(1,537*24)
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')

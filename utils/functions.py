@@ -59,6 +59,7 @@ def get_dict(dashPointer , model , image_np):
 
 
 def findBoxes(image_np , output_dict):
+    print(output_dict)
     height,width,channel = image_np.shape
     confidencesCars , boxesCars = [] , []
     confidencesLights , boxesLights = [] , []

@@ -116,7 +116,7 @@ def draw_lines(lanePointer , dashPointer , lane_image , image_np , flagLanes):
 
 
 
-cap=cv2.VideoCapture('../videos/r.mp4')
+cap=cv2.VideoCapture('../../bigDatas/videos/c.mp4')
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out1 = cv2.VideoWriter('lanes.avi', fourcc, 25, (1280,720))
 start_frame = 0*24

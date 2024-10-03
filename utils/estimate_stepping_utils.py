@@ -12,7 +12,7 @@ import copy
 import pathlib
 from collections import defaultdict
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -21,8 +21,8 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 def estimate_stepping(indexesPersons , boxesPersons , image_np , flagPerson , areaPerson , areaDetails):
 	pedes_present = 0
 	details = []
-	for j in indexesPersons:
-		i = j[0]
+	for i in indexesPersons:
+		# i = j[0]
 		xmin, ymin, w, h = boxesPersons[i]
 		curr_area = w * h
 		if curr_area > 9000:

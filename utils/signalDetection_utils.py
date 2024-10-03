@@ -12,7 +12,7 @@ import copy
 import pathlib
 from collections import defaultdict
 
-colors = np.random.uniform(0, 255, size=(100, 3))
+colors = np.random.uniform(0, 255, size=(1000, 3))
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
@@ -30,8 +30,8 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
   # trafficLights = []
   areas = []
   boxes = []
-  for j in indexesLights:
-    i = j[0]
+  for i in indexesLights:
+    # i = j[0]
     x, y, w, h = boxesLights[i]
     label = (w * h)
     if label < 450:
@@ -58,7 +58,7 @@ def signalDetection(indexesLights , boxesLights , image_np , signalCounter , fla
   maskRed = cv2.dilate(maskRed, None, iterations=2)
   cv2.imshow("red contours",maskRed)
 
-  (_, contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+  (contours , hierarchy) = cv2.findContours(maskRed.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
   hull = []
   redcircles = []
   flagSignal.pop(0) 
